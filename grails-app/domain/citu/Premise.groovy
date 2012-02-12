@@ -10,6 +10,8 @@ class Premise {
 	int squareArea
 	
 	ArrayList elecReadings = new ArrayList()
+	ArrayList waterReadings = new ArrayList()
+	ArrayList heatReadings = new ArrayList()
 	
 	User user
 	
@@ -17,17 +19,12 @@ class Premise {
 		return flatNo
 	}
 	
-	static hasMany=[setTobBoxes:SetTopBox, waterReadings:WaterReading, heatReadings:HeatReading]
+	static hasMany=[setTobBoxes:SetTopBox]
 
     static constraints = {
 		addressLine1(blank:false, nullable: false)
 		addressLine2(blank:false, nullable: false)
     }
 	
-	static transients = ['elecReadings']
-	
-	static mapping = {
-		heatReadings sort:'fileDate'
-		waterReadings sort:'dateCreated'
-	}
+	static transients = ['elecReadings', 'waterReadings', 'heatReadings']
 }

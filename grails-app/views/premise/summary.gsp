@@ -59,17 +59,19 @@
                             
                             <td valign="top" class="yui-skin-sam" colspan="2" align="center">
 								
-								<% 
+								<%
+								
 								def elecGraphData = []
 								for (i in simpleView.electricity.elecReadings) {
 									def dataObj = [[DateFormat.getDateInstance(DateFormat.SHORT).format(i.dateTime), i.readingValue]]
 									elecGraphData += dataObj
 								}
-								/*def waterGraphData = []
-								for (i in premiseInstance.waterReadings) {
-									def dataObj = [[DateFormat.getDateInstance(DateFormat.SHORT).format(i.fileDate), i.readingValueCold, i.readingValueHot, i.readingValueGrey]]
+								def waterGraphData = []
+								for (i in simpleView.water.waterReadings) {
+									def dataObj = [[DateFormat.getDateInstance(DateFormat.SHORT).format(i.dateTime), i.readingValueCold, i.readingValueHot, i.readingValueGrey]]
 									waterGraphData += dataObj
 								}
+								/*
 								def heatGraphData = []
 								for (i in premiseInstance.heatReadings) {
 									def dataObj = [[DateFormat.getDateInstance(DateFormat.SHORT).format(i.dateCreated), i.readingValueHeat]]

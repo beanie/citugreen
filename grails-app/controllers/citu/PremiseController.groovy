@@ -70,27 +70,36 @@ class PremiseController {
 		if (viewType.equals("day"))	{
 			
 			premiseInstance.elecReadings = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, d1.getTime()-1, d1.getTime(), [sort:"fileDate", order:"desc"])
+			premiseInstance.waterReadings = WaterReading.findAllByPremiseAndFileDateBetween(premiseInstance, d1.getTime()-1, d1.getTime(), [sort:"fileDate", order:"desc"])
+			
 			
 		} else if (viewType.equals("month")) {
 			
 			ArrayList electricityReadings = new ArrayList()
+			ArrayList waterReadings = new ArrayList()
 			def now = d1.getTime()
 			
 			4.times {
-				def week = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, now, now=(now+6), [sort:"fileDate", order:"desc"])
-				electricityReadings.add(new ElecReading(readingValueElec:BillUtil.calcTotal(week.readingValueElec), fileDate:now))
+				def elecWeek = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, now, now=(now+6), [sort:"fileDate", order:"desc"])
+				def waterWeek = WaterReading.findAllByPremiseAndFileDateBetween(premiseInstance, now, now=(now+6), [sort:"fileDate", order:"desc"])
+				electricityReadings.add(new ElecReading(readingValueElec:BillUtil.calcTotal(elecWeek.readingValueElec), fileDate:now))
+				waterReadings.add(new WaterReading(readingValueHot:BillUtil.calcTotal(waterWeek.readingValueHot), readingValueCold:BillUtil.calcTotal(waterWeek.readingValueCold), readingValueGrey:BillUtil.calcTotal(waterWeek.readingValueGrey), fileDate:now))
 				now = now+1
 			}
 			if (d1.getActualMaximum(Calendar.DAY_OF_MONTH) >= 28) {
 				def diff = d1.getActualMaximum(Calendar.DAY_OF_MONTH) - 29
-				def week = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, now, now=(now+diff), [sort:"fileDate", order:"desc"])
-				electricityReadings.add(new ElecReading(readingValueElec:BillUtil.calcTotal(week.readingValueElec), fileDate:now))
+				def elecWeek = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, now, now=(now+diff), [sort:"fileDate", order:"desc"])
+				def waterWeek = WaterReading.findAllByPremiseAndFileDateBetween(premiseInstance, now, now=(now+diff), [sort:"fileDate", order:"desc"])
+				electricityReadings.add(new ElecReading(readingValueElec:BillUtil.calcTotal(elecWeek.readingValueElec), fileDate:now))
+				waterReadings.add(new WaterReading(readingValueHot:BillUtil.calcTotal(waterWeek.readingValueHot), readingValueCold:BillUtil.calcTotal(waterWeek.readingValueCold), readingValueGrey:BillUtil.calcTotal(waterWeek.readingValueGrey), fileDate:now))
 			}
 			premiseInstance.elecReadings = electricityReadings
+			premiseInstance.waterReadings = waterReadings
 			
 		} else if (viewType.equals("year")) {
 		
 			ArrayList electricityReadings = new ArrayList()
+			ArrayList waterReadings = new ArrayList()
 			def now = d1.getTime()
 			def monthStart
 			def monthEnd
@@ -98,15 +107,19 @@ class PremiseController {
 			12.times {
 				monthStart = d1.getTime()
 				monthEnd = monthStart+(d1.getActualMaximum(Calendar.DAY_OF_MONTH)-1)
-				def month = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, monthStart, monthEnd, [sort:"fileDate", order:"desc"])
-				electricityReadings.add(new ElecReading(readingValueElec:BillUtil.calcTotal(month.readingValueElec), fileDate:monthStart))
+				def elecMonth = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, monthStart, monthEnd, [sort:"fileDate", order:"desc"])
+				def waterMonth = WaterReading.findAllByPremiseAndFileDateBetween(premiseInstance, monthStart, monthEnd, [sort:"fileDate", order:"desc"])
+				electricityReadings.add(new ElecReading(readingValueElec:BillUtil.calcTotal(elecMonth.readingValueElec), fileDate:monthStart))
+				waterReadings.add(new WaterReading(readingValueHot:BillUtil.calcTotal(waterMonth.readingValueHot), readingValueCold:BillUtil.calcTotal(waterMonth.readingValueCold), readingValueGrey:BillUtil.calcTotal(waterMonth.readingValueGrey), fileDate:monthStart))
 				nextMonth = (d1.get(Calendar.MONTH)+1)
 				d1.set(Calendar.MONTH, nextMonth)
 			}
 			premiseInstance.elecReadings = electricityReadings
+			premiseInstance.waterReadings = waterReadings
 		
 		}
 		premise.put("electricity", HelperUtil.createElectricityMap(premiseInstance))
+		premise.put("water", HelperUtil.createWaterMap(premiseInstance))
 		return premise
 	}
 }

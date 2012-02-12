@@ -59,7 +59,7 @@ class BootStrap {
 				24.times{
 					def next = random.nextInt(8)
 					ElecReading tmpReading = new ElecReading(readingValueElec:next, fileDate:now, premise:p).save()
-					//WaterReading tmpWater = new WaterReading(fileDate:now, coldWater:random.nextInt(30), hotWater:random.nextInt(30) + 2, greyWater:random.nextInt(30) + 1, premise:p).save()
+					WaterReading tmpWater = new WaterReading(fileDate:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p).save()
 					//HeatReading tmpHeat = new HeatReading(heatReading:random.nextInt(60), heatCost:0, premise:p).save()
 				}
 			}
