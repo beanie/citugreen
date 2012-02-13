@@ -22,7 +22,9 @@ class HelperUtil {
 		def heat = [:]
 		heat.put("heatReadings", heatReadings)
 		heat.put("heatTotalUsage", BillUtil.calcTotal(premiseInstance.heatReadings.readingValueHeat))
-		heat.put("heatTotalCost", BillUtil.calcTotalElecCost(premiseInstance.heatReadings.readingValueHeat))
+		heat.put("heatTotalCost", BillUtil.calcTotalHeatCost(premiseInstance.heatReadings.readingValueHeat))
+		heat.put("heatAverageUsage", heat.heatTotalUsage/heatReadings.size())
+		heat.put("heatAverageCost", heat.heatTotalCost/heatReadings.size())
 		return heat
 	}
 
@@ -35,7 +37,8 @@ class HelperUtil {
 		electricity.put("elecReadings", electricityReadings)
 		electricity.put("elecTotalUsage", BillUtil.calcTotal(premiseInstance.elecReadings.readingValueElec))
 		electricity.put("elecTotalCost", BillUtil.calcTotalElecCost(premiseInstance.elecReadings.readingValueElec))
-		electricity.put("elecAverageUsage", BillUtil.calcTotal(premiseInstance.elecReadings.readingValueElec)/electricityReadings.size())
+		electricity.put("elecAverageUsage", (electricity.elecTotalUsage/electricityReadings.size()))
+		electricity.put("elecAverageCost", (electricity.elecTotalCost/electricityReadings.size()))
 		return electricity
 	}
 
@@ -52,7 +55,13 @@ class HelperUtil {
 		water.put("waterTotalCostHot", BillUtil.calcTotalElecCost(premiseInstance.waterReadings.readingValueHot))
 		water.put("waterTotalCostCold", BillUtil.calcTotalElecCost(premiseInstance.waterReadings.readingValueCold))
 		water.put("waterTotalCostGrey", BillUtil.calcTotalElecCost(premiseInstance.waterReadings.readingValueGrey))
-		water.put("waterTotalCost", (water.waterTotalCostHot + water.waterTotalCostCold + water.waterTotalCostGrey))
+		water.put("waterAverageUsageHot", (water.waterTotalUsageHot/waterReadings.size()))
+		water.put("waterAverageUsageCold", (water.waterTotalUsageCold/waterReadings.size()))
+		water.put("waterAverageUsageGrey", (water.waterTotalUsageGrey/waterReadings.size()))
+		water.put("waterAverageCostHot", (water.waterTotalCostHot/waterReadings.size()))
+		water.put("waterAverageCostCold", (water.waterTotalCostCold/waterReadings.size()))
+		water.put("waterAverageCostGrey", (water.waterTotalCostGrey/waterReadings.size()))
+		water.put("waterCombinedTotalCost", (water.waterTotalCostHot + water.waterTotalCostCold + water.waterTotalCostGrey)))
 		return water
 	}
 
