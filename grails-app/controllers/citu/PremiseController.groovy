@@ -72,7 +72,6 @@ class PremiseController {
 			premiseInstance.elecReadings = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, d1.getTime()-1, d1.getTime(), [sort:"fileDate", order:"desc"])
 			premiseInstance.waterReadings = WaterReading.findAllByPremiseAndFileDateBetween(premiseInstance, d1.getTime()-1, d1.getTime(), [sort:"fileDate", order:"desc"])
 			
-			
 		} else if (viewType.equals("month")) {
 			
 			ArrayList electricityReadings = new ArrayList()
