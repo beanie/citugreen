@@ -6,7 +6,9 @@ import java.util.Map;
 
 import grails.converters.*
 
-class PremiseController {
+class PremiseController extends BaseController {
+
+	def beforeInterceptor = [action:this.&auth, except:["summary","getReadingsByDate"]]
 
 	def scaffold = true
 
