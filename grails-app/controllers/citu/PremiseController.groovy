@@ -21,7 +21,7 @@ class PremiseController {
 		}
 	}
 	
-	def readingsJsonByDate = {
+	def getReadingsByDate = {
 		
 		def Premise premiseInstance = HelperUtil.getPremise(params)
 		

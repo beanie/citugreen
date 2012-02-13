@@ -22,4 +22,16 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.eclipse.wst.common.project.facet.core.nature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>Fsrc</name>
+			<type>2</type>
+			<location>C:/Users/Beanie/.grails/1.3.7/projects/citu/plugins/file-uploader-1.2.1/src</location>
+		</link>
+		<link>
+			<name>file-uploader-1.2.1</name>
+			<type>2</type>
+			<location>C:/Users/Beanie/.grails/1.3.7/projects/citu/plugins/file-uploader-1.2.1</location>
+		</link>
+	</linkedResources>
 </projectDescription>
