@@ -14,6 +14,18 @@ class HelperUtil {
 		}
 	}
 	
+	static Map createHeatMap(Premise premiseInstance) {
+		ArrayList heatReadings = new ArrayList()
+		premiseInstance.heatReadings.each { reading ->
+			heatReadings.add([readingValue:reading.readingValueHeat, dateTime:reading.dateCreated])
+		}
+		def heat = [:]
+		heat.put("heatReadings", heatReadings)
+		heat.put("heatTotalUsage", BillUtil.calcTotal(premiseInstance.heatReadings.readingValueHeat))
+		heat.put("heatTotalCost", BillUtil.calcTotalElecCost(premiseInstance.heatReadings.readingValueHeat))
+		return heat
+	}
+	
 	static Map createElectricityMap(Premise premiseInstance) {
 		ArrayList electricityReadings = new ArrayList()
 		premiseInstance.elecReadings.each { reading ->
@@ -42,4 +54,5 @@ class HelperUtil {
 		water.put("waterTotalCost", (water.waterTotalCostHot + water.waterTotalCostCold + water.waterTotalCostGrey))
 		return water
 	}
+	
 }
