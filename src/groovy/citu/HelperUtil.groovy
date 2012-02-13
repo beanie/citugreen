@@ -1,7 +1,7 @@
 package citu
 
 class HelperUtil {
-	
+
 	static Premise getPremise(Map params) {
 		Premise premiseInstance
 		if (params.flatNo) {
@@ -13,7 +13,7 @@ class HelperUtil {
 			return premiseInstance
 		}
 	}
-	
+
 	static Map createHeatMap(Premise premiseInstance) {
 		ArrayList heatReadings = new ArrayList()
 		premiseInstance.heatReadings.each { reading ->
@@ -25,7 +25,7 @@ class HelperUtil {
 		heat.put("heatTotalCost", BillUtil.calcTotalElecCost(premiseInstance.heatReadings.readingValueHeat))
 		return heat
 	}
-	
+
 	static Map createElectricityMap(Premise premiseInstance) {
 		ArrayList electricityReadings = new ArrayList()
 		premiseInstance.elecReadings.each { reading ->
@@ -35,9 +35,10 @@ class HelperUtil {
 		electricity.put("elecReadings", electricityReadings)
 		electricity.put("elecTotalUsage", BillUtil.calcTotal(premiseInstance.elecReadings.readingValueElec))
 		electricity.put("elecTotalCost", BillUtil.calcTotalElecCost(premiseInstance.elecReadings.readingValueElec))
+		electricity.put("elecAverageUsage", BillUtil.calcTotal(premiseInstance.elecReadings.readingValueElec)/electricityReadings.size())
 		return electricity
 	}
-	
+
 	static Map createWaterMap(Premise premiseInstance) {
 		ArrayList waterReadings = new ArrayList()
 		premiseInstance.waterReadings.each { reading ->
@@ -54,5 +55,5 @@ class HelperUtil {
 		water.put("waterTotalCost", (water.waterTotalCostHot + water.waterTotalCostCold + water.waterTotalCostGrey))
 		return water
 	}
-	
+
 }

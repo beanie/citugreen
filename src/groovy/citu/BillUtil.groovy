@@ -1,9 +1,9 @@
 package citu
 
 class BillUtil {
-	
+
 	static TarrifList tarrifList = TarrifList.get(1)
-	
+
 	static Float calcTotal(ArrayList costs) {
 		def tmpFloat = 0
 		for (i in costs) {
@@ -13,7 +13,7 @@ class BillUtil {
 		}
 		return tmpFloat
 	}
-	
+
 	static Float calcTotalHeatCost(ArrayList costs){
 		return (calcTotal(costs)*tarrifList.heatTarrif)
 	}

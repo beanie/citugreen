@@ -78,7 +78,7 @@ class PremiseController {
 
 		} else if (viewType.equals("week")) {
 
-			def now = d1.getTime()-(d1.get(Calendar.DAY_OF_WEEK)-1)
+			def now = d1.getTime()-(d1.get(Calendar.DAY_OF_WEEK))
 
 			ArrayList electricityReadings = new ArrayList()
 			ArrayList waterReadings = new ArrayList()
@@ -86,8 +86,8 @@ class PremiseController {
 			7.times {
 				def elecDay = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, now, now+1, [sort:"fileDate", order:"desc"])
 				def waterDay = WaterReading.findAllByPremiseAndFileDateBetween(premiseInstance, now, now+1, [sort:"fileDate", order:"desc"])
-				electricityReadings.add(new ElecReading(readingValueElec:BillUtil.calcTotal(elecDay.readingValueElec), fileDate:now))
-				waterReadings.add(new WaterReading(readingValueHot:BillUtil.calcTotal(waterDay.readingValueHot), readingValueCold:BillUtil.calcTotal(waterDay.readingValueCold), readingValueGrey:BillUtil.calcTotal(waterDay.readingValueGrey), fileDate:now))
+				electricityReadings.add(new ElecReading(readingValueElec:BillUtil.calcTotal(elecDay.readingValueElec), fileDate:now+1))
+				waterReadings.add(new WaterReading(readingValueHot:BillUtil.calcTotal(waterDay.readingValueHot), readingValueCold:BillUtil.calcTotal(waterDay.readingValueCold), readingValueGrey:BillUtil.calcTotal(waterDay.readingValueGrey), fileDate:now+1))
 				now = now+1
 			}
 			premiseInstance.elecReadings = electricityReadings
