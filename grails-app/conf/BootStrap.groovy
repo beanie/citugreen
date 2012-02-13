@@ -47,12 +47,12 @@ class BootStrap {
 			SetTopBox stb8 = new SetTopBox(macAddress:'FA:BF:45:00:EE', TSMid:'36315464', premise:neilsFlat).save()
 			SetTopBox stb9 = new SetTopBox(macAddress:'WR:BF:T5:00:EE', TSMid:'6345345', premise:neilsFlat).save()
 		}
-		
+
 		if (!ElecReading.count()) {
 			def now = (new Date() - 265)
-			
+
 			Premise p = Premise.findByFlatNo("215")
-			
+
 			def random = new Random()
 			265.times {
 				now = (now + 1)
