@@ -39,14 +39,17 @@ class PremiseController {
 		def now = Calendar.getInstance()
 		def view
 
-		if (params.day && params.month && params.year) {
+		if (params.day && params.month && params.year && !params.week) {
 			log.info("simpleMapView - Day View")
 			now.set(params.int("year"), params.int("month")-1, params.int("day"))
 			view = createViewJsonObject(premiseInstance, now, "day")
+		} else if (params.day && params.month && params.year && params.week) {
+			log.info("simpleMapView - Week View")
+			now.set(params.int("year"), params.int("month")-1, params.int("day"))
+			view = createViewJsonObject(premiseInstance, now, "week")
 		} else if (params.month && params.year) {
 			log.info("simpleMapView - Month View")
 			now.set(params.int("year"), params.int("month")-1, 1)
-			log.info("NOW"+ now.getTime())
 			view = createViewJsonObject(premiseInstance, now, "month")
 		} else if (params.year) {
 			log.info("simpleMapView - Year View")
@@ -72,6 +75,23 @@ class PremiseController {
 
 			premiseInstance.elecReadings = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, d1.getTime()-1, d1.getTime(), [sort:"fileDate", order:"desc"])
 			premiseInstance.waterReadings = WaterReading.findAllByPremiseAndFileDateBetween(premiseInstance, d1.getTime()-1, d1.getTime(), [sort:"fileDate", order:"desc"])
+
+		} else if (viewType.equals("week")) {
+
+			def now = d1.getTime()-(d1.get(Calendar.DAY_OF_WEEK)-1)
+
+			ArrayList electricityReadings = new ArrayList()
+			ArrayList waterReadings = new ArrayList()
+
+			7.times {
+				def elecDay = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, now, now+1, [sort:"fileDate", order:"desc"])
+				def waterDay = WaterReading.findAllByPremiseAndFileDateBetween(premiseInstance, now, now+1, [sort:"fileDate", order:"desc"])
+				electricityReadings.add(new ElecReading(readingValueElec:BillUtil.calcTotal(elecDay.readingValueElec), fileDate:now))
+				waterReadings.add(new WaterReading(readingValueHot:BillUtil.calcTotal(waterDay.readingValueHot), readingValueCold:BillUtil.calcTotal(waterDay.readingValueCold), readingValueGrey:BillUtil.calcTotal(waterDay.readingValueGrey), fileDate:now))
+				now = now+1
+			}
+			premiseInstance.elecReadings = electricityReadings
+			premiseInstance.waterReadings = waterReadings
 
 		} else if (viewType.equals("month")) {
 
