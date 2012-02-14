@@ -10,7 +10,7 @@ class UserController extends BaseController {
 	}
 	
 	def doLogin = {
-		def user = User.findByContactEmailAndPassword(params.email, params.password);
+		def user = User.findByContactEmailAndPassword(params.email, params.password.encodeAsHash());
 		
 		if (user != null) {
 			session.user = user

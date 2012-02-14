@@ -3,6 +3,8 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
          <meta name="layout" content="main" />
         <title>Login</title>
+        <script type="text/javascript" src="/js/yui/2.7.0/utilities/utilities.js" ></script>
+       
     </head>
     <body>
         <div class="body">
@@ -12,7 +14,7 @@
                 </div>
                 <div class="buttons">
                     <span class="button"><input type="image" src="${resource(dir:'images',file:'login.png')}" onsubmit="submit-form();"></span>
-                </div>
+                </div>                
         </div>
     </body>
 </html>
