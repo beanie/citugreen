@@ -91,11 +91,3 @@ log4j = {
     warn   'org.mortbay.log',
 		   'org.codehaus.groovy.grails.web.servlet'  //  controllers
 }
-
-fileuploader {
-	content {
-		maxSize = 1024 * 256 //256 kbytes
-		allowedExtensions = ["jpg","jpeg","gif","png"]
-		path = "/tmp/avatar/"
-	}
-}
