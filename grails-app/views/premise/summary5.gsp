@@ -1,4 +1,4 @@
-<%@ page import="citugreen.Premise" %>
+<%@ page import="citu.Premise" %>
 <%@ page import="java.text.*" %>
 <html>
     <head>
@@ -10,7 +10,7 @@
     </head>
     <body>
 <section>
-            <h1>Summary for: ${fieldValue(bean: premiseInstance, field: "flatNo")} ${fieldValue(bean: premiseInstance, field: "addressLine1")}</h1>
+            <h1>Summary for: ${simpleView.flatNo} ${simpleView.addressLine1}</h1>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
@@ -21,56 +21,58 @@
 <tr>
 
 			<td valign="top" style="text-align: left;" class="value" colspan="5">
-			Electric Usage ${fieldValue(bean: premiseInstance, field: "totalElecUsage")}kWh
+			Electric Usage ${simpleView.electricity.elecTotalUsage}kWh
 			<td>
-			Electric Costs &pound;${fieldValue(bean: premiseInstance, field: "totalElecCost")}
+			Electric Costs &pound;${simpleView.electricity.elecTotalCost}
 			<td>
-			Heating Usage ${fieldValue(bean: premiseInstance, field: "totalHeatUsage")}kWh
+			Heating Usage TODO kWh
 			<td>
-			Heating Cost &pound;${fieldValue(bean: premiseInstance, field: "totalHeatCost")}
+			Heating Cost &pound TODO
 			<td>
-			Cold Water ${fieldValue(bean: premiseInstance, field: "totalColdWater")}L
+			Cold Water ${simpleView.water.coldTotalUsage}L
 			<td>
-			Hot Water ${fieldValue(bean: premiseInstance, field: "totalHotWater")}L
+			Hot Water ${simpleView.water.hotTotalUsage}L
 			<td>
-			Grey Water ${fieldValue(bean: premiseInstance, field: "totalGreyWater")}L
+			Grey Water ${simpleView.water.greyTotalUsage}L
 	</tr>		
 </table>
 </section>
 
 <section>
 			<%
+								
 			def elecGraphData = []
-			for (i in premiseInstance.elecReadings) {
-				def dataObj = [[DateFormat.getDateInstance(DateFormat.SHORT).format(i.fileDate), i.elecReading]]
+			for (i in simpleView.electricity.elecReadings) {
+				def dataObj = [[DateFormat.getDateInstance(DateFormat.SHORT).format(i.dateTime), i.readingValue]]
 				elecGraphData += dataObj
 			}
 			def waterGraphData = []
-			for (i in premiseInstance.waterReadings) {
-				def dataObj = [[DateFormat.getDateInstance(DateFormat.SHORT).format(i.fileDate), i.coldWater, i.hotWater, i.greyWater]]
+			for (i in simpleView.water.waterReadings) {
+				def dataObj = [[DateFormat.getDateInstance(DateFormat.SHORT).format(i.dateTime), i.readingValueCold, i.readingValueHot, i.readingValueGrey]]
 				waterGraphData += dataObj
 			}
+			/*
 			def heatGraphData = []
 			for (i in premiseInstance.heatReadings) {
-				def dataObj = [[DateFormat.getDateInstance(DateFormat.SHORT).format(i.dateCreated), i.heatReading]]
+				def dataObj = [[DateFormat.getDateInstance(DateFormat.SHORT).format(i.dateCreated), i.readingValueHeat]]
 				heatGraphData += dataObj
-			}
-			%>	
+			}*/
+			 %>		
 
 			<table>		
 			<tr>
 			<td>
-			<gvisualization:imageBarChart elementId="elecGraph" title="My Daily Electricity Usage" width="${300}" height="${200}" columns="[['string', 'Usage'], ['number', 'Electricity (kWh)']]" data="${elecGraphData}" />
+			<gvisualization:imageBarChart elementId="elecGraph" title="My Electricity Usage" width="${300}" height="${200}" columns="[['string', 'Usage'], ['number', 'Electricity (kWh)']]" data="${elecGraphData}" />
 			<div id="elecGraph"></div>
 
 			<td>
 
-			<gvisualization:imageBarChart elementId="heatGraph" title="My Daily Heat Usage" width="${300}" height="${200}" columns="[['string', 'Usage'], ['number', 'Electricity (kWh)']]" data="${heatGraphData}" />
+			<gvisualization:imageBarChart elementId="heatGraph" title="My Heat Usage" width="${300}" height="${200}" columns="[['string', 'Usage'], ['number', 'Electricity (kWh)']]" data="${heatGraphData}" />
 			<div id="heatGraph"></div>
 
 			<td>
 
-			<gvisualization:imageBarChart elementId="waterGraph" title="My Daily Water Usage" width="${300}" height="${200}" columns="[['string', 'Usage'], ['number', 'Cold Water (m3)'], ['number', 'Hot Water (m3)'], ['number', 'Grey Water (m3)']]" data="${waterGraphData}" />
+			<gvisualization:imageBarChart elementId="waterGraph" title="My Water Usage" width="${300}" height="${200}" columns="[['string', 'Usage'], ['number', 'Cold Water (m3)'], ['number', 'Hot Water (m3)'], ['number', 'Grey Water (m3)']]" data="${waterGraphData}" />
 			<div id="waterGraph"></div>
 			</tr>
 

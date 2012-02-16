@@ -80,15 +80,15 @@
 								 %>								
 								<gui:tabView>
 								    <gui:tab label="Electricity Readings" active="true">
-								        <gvisualization:barCoreChart elementId="elecGraph" title="My Daily Electricity Usage" width="${450}" height="${300}" columns="[['string', 'Usage'], ['number', 'Electricity (kWh)']]" data="${elecGraphData}" />
+								        <gvisualization:barCoreChart elementId="elecGraph" title="My Electricity Usage" width="${450}" height="${300}" columns="[['string', 'Usage'], ['number', 'Electricity (kWh)']]" data="${elecGraphData}" />
 										<div id="elecGraph"></div>
 								    </gui:tab>
 								    <gui:tab label="Heat Readings">
-								        <gvisualization:barCoreChart elementId="heatGraph" title="My Daily Heat Usage" width="${450}" height="${300}" columns="[['string', 'Usage'], ['number', 'Electricity (kWh)']]" data="${heatGraphData}" />
+								        <gvisualization:barCoreChart elementId="heatGraph" title="My Heat Usage" width="${450}" height="${300}" columns="[['string', 'Usage'], ['number', 'Electricity (kWh)']]" data="${heatGraphData}" />
 										<div id="heatGraph"></div>
 								    </gui:tab>
 								    <gui:tab label="Water Readings">
-								        <gvisualization:barCoreChart elementId="waterGraph" title="My Daily Water Usage" width="${450}" height="${300}" columns="[['string', 'Usage'], ['number', 'Cold Water (m3)'], ['number', 'Hot Water (m3)'], ['number', 'Grey Water (m3)']]" data="${waterGraphData}" />
+								        <gvisualization:barCoreChart elementId="waterGraph" title="My Water Usage" width="${450}" height="${300}" columns="[['string', 'Usage'], ['number', 'Cold Water (m3)'], ['number', 'Hot Water (m3)'], ['number', 'Grey Water (m3)']]" data="${waterGraphData}" />
 										<div id="waterGraph"></div>
 								    </gui:tab>
 								</gui:tabView>

@@ -13,6 +13,17 @@ class PremiseController extends BaseController {
 	def scaffold = true
 
 	def summary = {
+		
+				def Premise premiseInstance = HelperUtil.getPremise(params)
+		
+				if (!premiseInstance) {
+					render("invalid premise ID")
+				} else {
+					[simpleView: simpleView(params)]
+				}
+			}
+	
+	def summary5 = {
 
 		def Premise premiseInstance = HelperUtil.getPremise(params)
 

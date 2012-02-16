@@ -24,8 +24,9 @@ class BootStrap {
 			TarrifList tl = new TarrifList(coldWaterTarrif:0.003339, hotWaterTarrif:0.006249, greyWaterTarrif:0.001365, elecTarrif:0.108, heatTarrif:0.1163).save()
 		}
 		if(!User.count()) {
-			User phil = new User(userType: 'admin', password:'password'.encodeAsHash(), userName:'psellick', firstName:'Phil', lastName:'Sellick', contactEmail:'sonic@sellick.org', vmUserId:'45465654').save()
-			User ben = new User(userType: 'admin', password:'password'.encodeAsHash(), userName:'bhanson', firstName:'Ben', lastName:'Hanson', contactEmail:'ben@chilling.co.uk', vmUserId:'12154852').save()
+			User phil = new User(userType: 'admin', password:'password', userName:'psellick', firstName:'Phil', lastName:'Sellick', contactEmail:'sonic@sellick.org', vmUserId:'45465654').save()
+			//User ben = new User(userType: 'admin', password:'password'.encodeAsHash(), userName:'bhanson', firstName:'Ben', lastName:'Hanson', contactEmail:'ben@chilling.co.uk', vmUserId:'12154852').save()
+			User ben = new User(userType: 'admin', password:'password', userName:'bhanson', firstName:'Ben', lastName:'Hanson', contactEmail:'ben@chilling.co.uk', vmUserId:'12154852').save()
 			User neil = new User(userType: 'user', userName:'nillingworth', firstName:'Neil', lastName:'Illingworth', contactEmail:'neil@virginmedia.com', vmUserId:'12154852').save()
 			User helen = new User(userType: 'user', userName:'hsellick', firstName:'Helen', lastName:'Sellick', contactEmail:'helen@virginmedia.com', vmUserId:'12154852').save()
 			User john = new User(userType: 'user', userName:'jhiggins', firstName:'John', lastName:'Higgins', contactEmail:'john@virginmedia.com', vmUserId:'12154852').save()
