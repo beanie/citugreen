@@ -8,7 +8,7 @@ import grails.converters.*
 
 class PremiseController extends BaseController {
 
-	def beforeInterceptor = [action:this.&auth, except:["summary","getReadingsByDate"]]
+	def beforeInterceptor = [action:this.&auth, except:["getReadingsByDate", "oddTest"]]
 
 	def scaffold = true
 
@@ -83,7 +83,8 @@ class PremiseController extends BaseController {
 
 		def user = [firstName:premiseInstance.user.firstName, lastName:premiseInstance.user.lastName, userName:premiseInstance.user.userName, contactEmail:premiseInstance.user.contactEmail, userId: premiseInstance.user.id]
 		def premise = [flatNo:premiseInstance.flatNo, addressLine1:premiseInstance.addressLine1, addressLine1:premiseInstance.addressLine2, postCode:premiseInstance.postCode, rooms:premiseInstance.rooms, squareArea:premiseInstance.squareArea, user:user]
-
+		def averages = [:]
+		
 		if (viewType.equals("day"))	{
 
 			premiseInstance.elecReadings = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, d1.getTime()-1, d1.getTime(), [sort:"fileDate", order:"desc"])
@@ -103,6 +104,7 @@ class PremiseController extends BaseController {
 				waterReadings.add(new WaterReading(readingValueHot:BillUtil.calcTotal(waterDay.readingValueHot), readingValueCold:BillUtil.calcTotal(waterDay.readingValueCold), readingValueGrey:BillUtil.calcTotal(waterDay.readingValueGrey), fileDate:now+1))
 				now = now+1
 			}
+			//TODO getAverage(premiseInstance.rooms, now - 7, now)
 			premiseInstance.elecReadings = electricityReadings
 			premiseInstance.waterReadings = waterReadings
 
@@ -111,6 +113,7 @@ class PremiseController extends BaseController {
 			ArrayList electricityReadings = new ArrayList()
 			ArrayList waterReadings = new ArrayList()
 			def now = d1.getTime()
+			averages = getElecAverage(premiseInstance.rooms, now, now + (d1.getActualMaximum(Calendar.DAY_OF_MONTH)-1))
 
 			4.times {
 				def elecWeek = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, now, now+6, [sort:"fileDate", order:"desc"])
@@ -153,6 +156,55 @@ class PremiseController extends BaseController {
 		}
 		premise.put("electricity", HelperUtil.createElectricityMap(premiseInstance))
 		premise.put("water", HelperUtil.createWaterMap(premiseInstance))
+		premise.put("buildingTotalAveragesForPeriod", averages)
 		return premise
 	}
+	
+	Map getElecAverage(int noOfRooms, Date startDate, Date endDate) {
+		def premises = Premise.executeQuery("select p.flatNo from Premise p where rooms = "+ noOfRooms)
+		def averages = [:]
+		def tmpElecFloat = 0
+		def tmpHeatFloat = 0
+		def tmpGreyFloat = 0
+		def tmpColdFloat = 0
+		def tmpHotFloat = 0
+		def goodElecReadings = 0
+		def goodHeatReadings = 0
+		def goodWaterReadings = 0
+		for (i in premises) {
+			def sumElec = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ i +" and reading.fileDate between:date1 AND :date2 ", [date1:startDate, date2:endDate])
+			def sumHeat = HeatReading.executeQuery("select sum(reading.readingValueHeat) from HeatReading as reading where reading.premise.flatNo = "+ i +" and reading.dateCreated between:date1 AND :date2 ", [date1:startDate, date2:endDate])
+			def sumWater = WaterReading.executeQuery("select sum(reading.readingValueHot), sum(reading.readingValueCold), sum(reading.readingValueGrey) from WaterReading as reading where reading.premise.flatNo = "+ i +" and reading.fileDate between:date1 AND :date2 ", [date1:startDate, date2:endDate])
+			// ignore Elec for empty values
+			if (sumElec[0]) {
+				tmpElecFloat = (tmpElecFloat + sumElec[0])
+				goodElecReadings ++
+			}
+			// ignore Heat for empty values
+			if (sumHeat[0]) {
+				tmpHeatFloat = (tmpHeatFloat + sumHeat[0])
+				goodHeatReadings ++
+			}
+			// ignore Water for empty values
+			if (sumWater[0][2]) {
+				tmpHotFloat = (tmpHotFloat + sumWater[0][0])
+				tmpColdFloat = (tmpColdFloat + sumWater[0][1])
+				tmpGreyFloat = (tmpGreyFloat + sumWater[0][2])
+				goodWaterReadings ++
+			}
+		}
+		if (goodElecReadings > 0) {
+			averages.put("averageElec", (tmpElecFloat / goodElecReadings))
+		}
+		if (goodHeatReadings > 0) {
+			averages.put("averageHeat", (tmpHeatFloat / goodHeatReadings))
+		}
+		if (goodWaterReadings > 0) {
+			averages.put("averageWaterHot", (tmpHotFloat / goodWaterReadings))
+			averages.put("averageColdHot", (tmpColdFloat / goodWaterReadings))
+			averages.put("averageGreyHot", (tmpGreyFloat / goodWaterReadings))
+		}
+		return averages
+	}
+	
 }

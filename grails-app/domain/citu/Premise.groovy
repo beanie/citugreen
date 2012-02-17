@@ -20,7 +20,7 @@ class Premise {
 	}
 	
 	static hasMany=[setTobBoxes:SetTopBox]
-
+	
     static constraints = {
 		addressLine1(blank:false, nullable: false)
 		addressLine2(blank:false, nullable: false)

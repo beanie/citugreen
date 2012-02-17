@@ -30,10 +30,10 @@ class BootStrap {
 			User neil = new User(userType: 'user', userName:'nillingworth', firstName:'Neil', lastName:'Illingworth', contactEmail:'neil@virginmedia.com', vmUserId:'12154852').save()
 			User helen = new User(userType: 'user', userName:'hsellick', firstName:'Helen', lastName:'Sellick', contactEmail:'helen@virginmedia.com', vmUserId:'12154852').save()
 			User john = new User(userType: 'user', userName:'jhiggins', firstName:'John', lastName:'Higgins', contactEmail:'john@virginmedia.com', vmUserId:'12154852').save()
-			Premise philsFlat = new Premise(rooms:2, flatNo:'308', addressLine1:'Sonic House', addressLine2:'CituGreen Est.', postCode:'SW5 3AP', user:phil).save()
-			Premise bensFlat = new Premise(rooms:2, flatNo:'309', addressLine1:'Beanie House', addressLine2:'CituGreen Est.', postCode:'SW15 5AS', user:ben).save()
-			Premise bobsFlat = new Premise(rooms:2, flatNo:'607', addressLine1:'Sonic House', addressLine2:'CituGreen Est.', postCode:'SW5 3AP', user:phil).save()
-			Premise keithsFlat = new Premise(rooms:2, flatNo:'215',addressLine1:'Beanie House', addressLine2:'CituGreen Est.', postCode:'SW15 5AS', user:ben).save()
+			Premise philsFlat = new Premise(rooms:1, flatNo:'308', addressLine1:'Sonic House', addressLine2:'CituGreen Est.', postCode:'SW5 3AP', user:phil).save()
+			Premise bensFlat = new Premise(rooms:1, flatNo:'309', addressLine1:'Beanie House', addressLine2:'CituGreen Est.', postCode:'SW15 5AS', user:ben).save()
+			Premise bobsFlat = new Premise(rooms:1, flatNo:'607', addressLine1:'Sonic House', addressLine2:'CituGreen Est.', postCode:'SW5 3AP', user:phil).save()
+			Premise keithsFlat = new Premise(rooms:1, flatNo:'215',addressLine1:'Beanie House', addressLine2:'CituGreen Est.', postCode:'SW15 5AS', user:ben).save()
 			Premise johnsFlat = new Premise(rooms:2, flatNo:'606', addressLine1:'Sonic House', addressLine2:'CituGreen Est.', postCode:'SW5 3AP', user:john).save()
 			Premise helenFlat = new Premise(rooms:2, flatNo:'608', addressLine1:'Beanie House', addressLine2:'CituGreen Est.', postCode:'SW5 3AP', user:helen).save()
 			Premise jacksFlat = new Premise(rooms:2, flatNo:'106', addressLine1:'Sonic House', addressLine2:'CituGreen Est.', postCode:'SW5 3AP', user:phil).save()
@@ -50,16 +50,19 @@ class BootStrap {
 		}
 
 		if (!ElecReading.count()) {
-			def now = (new Date() - 265)
+			def now = (new Date() - 50)
 
 			Premise p = Premise.findByFlatNo("215")
+			Premise p1 = Premise.findByFlatNo("606")
+			Premise p2 = Premise.findByFlatNo("608")
 
 			def random = new Random()
-			265.times {
+			50.times {
 				now = (now + 1)
 				24.times{
-					def next = random.nextInt(8)
-					ElecReading tmpReading = new ElecReading(readingValueElec:next, fileDate:now, premise:p).save()
+					ElecReading tmpReading = new ElecReading(readingValueElec:random.nextInt(8), fileDate:now, premise:p1).save()
+					ElecReading tmpReading1 = new ElecReading(readingValueElec:random.nextInt(8), fileDate:now, premise:p2).save()
+					ElecReading tmpReading2 = new ElecReading(readingValueElec:random.nextInt(8), fileDate:now, premise:p).save()
 					WaterReading tmpWater = new WaterReading(fileDate:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p).save()
 					//HeatReading tmpHeat = new HeatReading(heatReading:random.nextInt(60), heatCost:0, premise:p).save()
 				}
