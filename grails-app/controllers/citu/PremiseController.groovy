@@ -8,7 +8,7 @@ import grails.converters.*
 
 class PremiseController extends BaseController {
 
-	def beforeInterceptor = [action:this.&auth, except:["getReadingsByDate", "oddTest"]]
+	def beforeInterceptor = [action:this.&auth, except:["getReadingsByDate"]]
 
 	def scaffold = true
 
