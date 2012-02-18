@@ -6,6 +6,8 @@ import java.util.Map;
 
 import grails.converters.*
 
+//TODO something fishy with the dates
+
 class PremiseController extends BaseController {
 
 	def beforeInterceptor = [action:this.&auth, except:["getReadingsByDate"]]
@@ -62,7 +64,7 @@ class PremiseController extends BaseController {
 			view = createViewJsonObject(premiseInstance, now, "week")
 		} else if (params.month && params.year) {
 			log.info("simpleMapView - Month View")
-			now.set(params.int("year"), params.int("month")-1, 1)
+			now.set(params.int("year"), params.int("month")-1, 1, 00, 00, 00)
 			view = createViewJsonObject(premiseInstance, now, "month")
 		} else if (params.year) {
 			log.info("simpleMapView - Year View")
@@ -104,7 +106,6 @@ class PremiseController extends BaseController {
 				waterReadings.add(new WaterReading(readingValueHot:BillUtil.calcTotal(waterDay.readingValueHot), readingValueCold:BillUtil.calcTotal(waterDay.readingValueCold), readingValueGrey:BillUtil.calcTotal(waterDay.readingValueGrey), fileDate:now+1))
 				now = now+1
 			}
-			//TODO getAverage(premiseInstance.rooms, now - 7, now)
 			premiseInstance.elecReadings = electricityReadings
 			premiseInstance.waterReadings = waterReadings
 
@@ -118,6 +119,7 @@ class PremiseController extends BaseController {
 			4.times {
 				def elecWeek = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, now, now+6, [sort:"fileDate", order:"desc"])
 				def waterWeek = WaterReading.findAllByPremiseAndFileDateBetween(premiseInstance, now, now+6, [sort:"fileDate", order:"desc"])
+				log.info("Dates : "+ now +" : "+ (now+6) +" values : "+ BillUtil.calcTotal(elecWeek.readingValueElec))
 				electricityReadings.add(new ElecReading(readingValueElec:BillUtil.calcTotal(elecWeek.readingValueElec), fileDate:now))
 				waterReadings.add(new WaterReading(readingValueHot:BillUtil.calcTotal(waterWeek.readingValueHot), readingValueCold:BillUtil.calcTotal(waterWeek.readingValueCold), readingValueGrey:BillUtil.calcTotal(waterWeek.readingValueGrey), fileDate:now))
 				now = now+7
@@ -126,6 +128,7 @@ class PremiseController extends BaseController {
 				def diff = d1.getActualMaximum(Calendar.DAY_OF_MONTH) - 29
 				def elecWeek = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, now, now+diff, [sort:"fileDate", order:"desc"])
 				def waterWeek = WaterReading.findAllByPremiseAndFileDateBetween(premiseInstance, now, now+diff, [sort:"fileDate", order:"desc"])
+				log.info("Dates : "+ now +" : "+ (now+diff) +" values : "+ BillUtil.calcTotal(elecWeek.readingValueElec))
 				electricityReadings.add(new ElecReading(readingValueElec:BillUtil.calcTotal(elecWeek.readingValueElec), fileDate:now))
 				waterReadings.add(new WaterReading(readingValueHot:BillUtil.calcTotal(waterWeek.readingValueHot), readingValueCold:BillUtil.calcTotal(waterWeek.readingValueCold), readingValueGrey:BillUtil.calcTotal(waterWeek.readingValueGrey), fileDate:now))
 			}
@@ -177,6 +180,9 @@ class PremiseController extends BaseController {
 			def sumWater = WaterReading.executeQuery("select sum(reading.readingValueHot), sum(reading.readingValueCold), sum(reading.readingValueGrey) from WaterReading as reading where reading.premise.flatNo = "+ i +" and reading.fileDate between:date1 AND :date2 ", [date1:startDate, date2:endDate])
 			// ignore Elec for empty values
 			if (sumElec[0]) {
+				log.info(startDate)
+				log.info(endDate)
+				log.info("flat "+i + " " +sumElec)
 				tmpElecFloat = (tmpElecFloat + sumElec[0])
 				goodElecReadings ++
 			}
