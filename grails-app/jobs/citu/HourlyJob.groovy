@@ -2,9 +2,12 @@ package citu
 
 
 class HourlyJob {
-    def timeout = 5000l // execute job once in 5 seconds
+    
+	EnergyReadingService energyReadingService
+
+	def cronExpression = "0 0 * * * ?" // run on 0 second 0 minute all the time
 
     def execute() {
-        // execute task
+        energyReadingService.frig()
     }
 }

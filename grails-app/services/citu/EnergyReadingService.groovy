@@ -11,6 +11,27 @@ class EnergyReadingService {
 	
 	static transactional = true
 	
+	def frig() {
+	
+		def now = new Date()
+		
+		Premise p = Premise.findByFlatNo("215")
+		Premise p1 = Premise.findByFlatNo("606")
+		Premise p2 = Premise.findByFlatNo("106")
+		Premise p3 = Premise.findByFlatNo("608")
+		Premise p4 = Premise.findByFlatNo("610")
+	
+		def random = new Random()
+	
+		ElecReading tmpReading = new ElecReading(readingValueElec:random.nextInt(8), fileDate:now, premise:p1).save()
+		ElecReading tmpReading1 = new ElecReading(readingValueElec:random.nextInt(8), fileDate:now, premise:p2).save()
+		ElecReading tmpReading2 = new ElecReading(readingValueElec:random.nextInt(8), fileDate:now, premise:p).save()
+		ElecReading tmpReading3 = new ElecReading(readingValueElec:random.nextInt(8), fileDate:now, premise:p3).save()
+		ElecReading tmpReading4 = new ElecReading(readingValueElec:random.nextInt(8), fileDate:now, premise:p4).save()
+		WaterReading tmpWater = new WaterReading(fileDate:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p).save()
+
+	}
+	
 	def processElec() {
 		def elecUrls = EnergyFileRef.findAllByCategory('Electricity')
 		processXml(elecUrls)

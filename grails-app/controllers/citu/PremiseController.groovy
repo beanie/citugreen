@@ -159,6 +159,56 @@ class PremiseController extends BaseController {
 		premise.put("buildingTotalAveragesForPeriod", averages)
 		return premise
 	}
+	
+	Map getHighLow(int noOfRooms, Date startDate, Date endDate) {
+		def premises = Premise.executeQuery("select p.flatNo from Premise p where bedrooms = "+ noOfRooms)
+		def heatReadings = new ArrayList()
+		def waterHotReadings = new ArrayList()
+		def waterColdReadings = new ArrayList()
+		def waterGreyReadings = new ArrayList()
+		def elecReadings = new ArrayList()
+		for (i in premises) {
+			def sumElec = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ i +" and reading.fileDate between:date1 AND :date2 ", [date1:startDate, date2:endDate])
+			def sumHeat = HeatReading.executeQuery("select sum(reading.readingValueHeat) from HeatReading as reading where reading.premise.flatNo = "+ i +" and reading.dateCreated between:date1 AND :date2 ", [date1:startDate, date2:endDate])
+			def sumWater = WaterReading.executeQuery("select sum(reading.readingValueHot), sum(reading.readingValueCold), sum(reading.readingValueGrey) from WaterReading as reading where reading.premise.flatNo = "+ i +" and reading.fileDate between:date1 AND :date2 ", [date1:startDate, date2:endDate])
+			// ignore Elec for empty values
+			if (sumElec[0]) {
+				elecReadings.add(sumElec[0])
+			}
+			// ignore Heat for empty values
+			if (sumHeat[0]) {
+				heatReadings.add(sumHeat[0])
+			}
+			// ignore Water for empty values
+			if (sumWater[0][2]) {
+				waterHotReadings.add(sumWater[0][0])
+				waterColdReadings.add(sumWater[0][1])
+				waterGreyReadings.add(sumWater[0][2])
+			}
+		}
+		if (elecReadings.size() > 0) {
+			elecReadings.sort()
+			log.info("ELEC LOW : "+ elecReadings[0])
+			log.info("ELEC HIGH : "+ elecReadings[elecReadings.size() - 1])
+		}
+		if (heatReadings.size() > 0) {
+			heatReadings.sort()
+			log.info("HEAT LOW : "+ heatReadings[0])
+			log.info("HEAT HIGH : "+ heatReadings[heatReadings.size() - 1])
+		}
+		if (waterGreyReadings.size() > 0) {
+			// TODO not finished the water readings sort for high and low
+			waterHotReadings.sort()
+			waterHotReadings.sort()
+			waterHotReadings.sort()
+			log.info("GREY LOW : "+ waterGreyReadings[0])
+			log.info("GREY HIGH : "+ waterGreyReadings[waterGreyReadings.size() - 1])
+			log.info("HOT LOW : "+ waterHotReadings[0])
+			log.info("HOT HIGH : "+ waterHotReadings[waterHotReadings.size() - 1])
+			log.info("COLD LOW : "+ waterColdReadings[0])
+			log.info("COLD HIGH : "+ waterColdReadings[waterColdReadings.size() - 1])
+		}
+	}
 
 	Map getTrueAverage(int noOfRooms, Date startDate, Date endDate) {
 		def premises = Premise.executeQuery("select p.flatNo from Premise p where bedrooms = "+ noOfRooms)
