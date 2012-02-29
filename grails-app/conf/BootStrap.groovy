@@ -49,6 +49,7 @@ class BootStrap {
 			SetTopBox stb9 = new SetTopBox(macAddress:'WR:BF:T5:00:EE', TSMid:'6345345', premise:neilsFlat).save()
 		}
 
+		/*
 		if (!ElecReading.count()) {
 			def now = (new Date() - 50)
 
@@ -71,7 +72,7 @@ class BootStrap {
 					//HeatReading tmpHeat = new HeatReading(heatReading:random.nextInt(60), heatCost:0, premise:p).save()
 				}
 			}
-		}
+		}*/
     }
     def destroy = {
     }

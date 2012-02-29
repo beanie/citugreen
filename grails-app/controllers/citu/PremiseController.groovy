@@ -20,7 +20,7 @@ class PremiseController extends BaseController {
 		if (!premiseInstance) {
 			render("invalid premise ID")
 		} else {
-			[simpleView: simpleView(params)]
+			[simpleView: simpleViewMap(params)]
 		}
 	}
 
@@ -31,7 +31,7 @@ class PremiseController extends BaseController {
 		if (!premiseInstance) {
 			render("invalid premise ID")
 		} else {
-			[simpleView: simpleView(params)]
+			[simpleView: simpleViewMap(params)]
 		}
 	}
 
