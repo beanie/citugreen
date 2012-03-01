@@ -1,6 +1,7 @@
 package citu
 
 import java.text.*
+import java.util.Date;
 import java.util.Map;
 
 import org.joda.time.*
@@ -9,7 +10,7 @@ import grails.converters.*
 
 class PremiseController extends BaseController {
 
-	def beforeInterceptor = [action:this.&auth, except:["getReadingsByDate"]]
+	def beforeInterceptor = [action:this.&auth, except:["getReadingsByDate", "getReadingsSummary"]]
 
 	def scaffold = true
 
@@ -44,6 +45,70 @@ class PremiseController extends BaseController {
 		} else {
 			render simpleViewMap(params) as JSON
 		}
+	}
+	
+	def getReadingsSummary = {
+		
+		def Premise premiseInstance = HelperUtil.getPremise(params)
+		
+		if (!premiseInstance) {
+			render("invalid premise ID")
+		} else {
+			
+		TarrifList tarrifList = TarrifList.get(1)
+		
+		def now = new DateTime()
+			now = new DateTime(now.getYear(), now.getMonthOfYear(), now.getDayOfMonth(), 0, 0, 0, 0)
+			def endOfDay = now.plusDays(1).minusSeconds(1)	
+
+			premiseInstance.elecReadings = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), endOfDay.toDate(), [sort:"fileDate", order:"desc"])
+			premiseInstance.waterReadings = WaterReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), endOfDay.toDate(), [sort:"fileDate", order:"desc"])
+			//TODO add Heat query
+			
+			def premise = HelperUtil.createPremiseSkeletonMap(premiseInstance)
+			def highlows = getHighLow(premiseInstance.bedrooms, now.toDate(), endOfDay.toDate())
+			
+			//TODO neater way to get the sum figure>???
+			//def sumElec = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ i +" and reading.fileDate between:date1 AND :date2 ", [date1:now.toDate(), date2:endOfDay.toDate()])
+
+			def electricity = [:]
+			electricity.put("currentCost", BillUtil.calcTotalElecCost(premiseInstance.elecReadings.readingValueElec))
+			electricity.put("averageCost", (BillUtil.calcTotalElecCost(premiseInstance.elecReadings.readingValueElec)-2))
+			electricity.put("estimateCost", (BillUtil.calcTotalElecCost(premiseInstance.elecReadings.readingValueElec)+5))
+			electricity.put("swingLow", (highlows.elec.low*tarrifList.elecTarrif))
+			electricity.put("swingHigh", (highlows.elec.high*tarrifList.elecTarrif))
+			premise.put("electricity", electricity)
+			
+			def greyWater = [:]
+			greyWater.put("currentCost", BillUtil.calcTotalGreyWaterCost(premiseInstance.waterReadings.readingValueGrey))
+			greyWater.put("averageCost", (BillUtil.calcTotalGreyWaterCost(premiseInstance.waterReadings.readingValueGrey)/2))
+			greyWater.put("estimateCost", (BillUtil.calcTotalGreyWaterCost(premiseInstance.waterReadings.readingValueGrey)+1))
+			greyWater.put("swingLow", (highlows.greyWater.low*tarrifList.greyWaterTarrif))
+			greyWater.put("swingHigh", (highlows.greyWater.high*tarrifList.greyWaterTarrif))
+			premise.put("greyWater", greyWater)
+			
+			def coldWater = [:]
+			coldWater.put("currentCost", BillUtil.calcTotalColdWaterCost(premiseInstance.waterReadings.readingValueCold))
+			coldWater.put("averageCost", (BillUtil.calcTotalColdWaterCost(premiseInstance.waterReadings.readingValueCold)/2))
+			coldWater.put("estimateCost", (BillUtil.calcTotalColdWaterCost(premiseInstance.waterReadings.readingValueCold)+1))
+			coldWater.put("swingLow", (highlows.coldWater.low*tarrifList.coldWaterTarrif))
+			coldWater.put("swingHigh", (highlows.coldWater.high*tarrifList.coldWaterTarrif))
+			premise.put("coldWater", coldWater)
+			
+			def hotWater = [:]
+			hotWater.put("currentCost", BillUtil.calcTotalHotWaterCost(premiseInstance.waterReadings.readingValueHot))
+			hotWater.put("averageCost", (BillUtil.calcTotalHotWaterCost(premiseInstance.waterReadings.readingValueHot)/2))
+			hotWater.put("estimateCost", (BillUtil.calcTotalHotWaterCost(premiseInstance.waterReadings.readingValueHot)+1))
+			hotWater.put("swingLow", (highlows.hotWater.low*tarrifList.hotWaterTarrif))
+			hotWater.put("swingHigh", (highlows.hotWater.high*tarrifList.hotWaterTarrif))
+			premise.put("hotWater", hotWater)
+			
+			//premise.put("water", HelperUtil.createWaterMap(premiseInstance))
+			//TODO add Heat map
+			
+			render premise as JSON
+		}
+		
 	}
 
 	Map simpleViewMap(Map params) {
@@ -84,8 +149,8 @@ class PremiseController extends BaseController {
 
 	Map createViewJsonObject(Premise premiseInstance, DateTime now, String viewType) {
 
-		def user = [firstName:premiseInstance.user.firstName, lastName:premiseInstance.user.lastName, userName:premiseInstance.user.userName, contactEmail:premiseInstance.user.contactEmail, userId: premiseInstance.user.id]
-		def premise = [flatNo:premiseInstance.flatNo, addressLine1:premiseInstance.addressLine1, addressLine1:premiseInstance.addressLine2, postCode:premiseInstance.postCode, bedrooms:premiseInstance.bedrooms, squareArea:premiseInstance.squareArea, user:user]
+		def premise = createPremiseSkeletonMap(premiseInstance)
+
 		def averages = [:]
 
 		if (viewType.equals("day"))	{
@@ -162,6 +227,7 @@ class PremiseController extends BaseController {
 	
 	Map getHighLow(int noOfRooms, Date startDate, Date endDate) {
 		def premises = Premise.executeQuery("select p.flatNo from Premise p where bedrooms = "+ noOfRooms)
+		def readings = [:]
 		def heatReadings = new ArrayList()
 		def waterHotReadings = new ArrayList()
 		def waterColdReadings = new ArrayList()
@@ -188,26 +254,38 @@ class PremiseController extends BaseController {
 		}
 		if (elecReadings.size() > 0) {
 			elecReadings.sort()
-			log.info("ELEC LOW : "+ elecReadings[0])
-			log.info("ELEC HIGH : "+ elecReadings[elecReadings.size() - 1])
+			def elec = [low:elecReadings[0], high:elecReadings[elecReadings.size() - 1]]
+			readings.put("elec", elec)
+			log.debug("ELEC LOW : "+ elecReadings[0])
+			log.debug("ELEC HIGH : "+ elecReadings[elecReadings.size() - 1])
 		}
 		if (heatReadings.size() > 0) {
 			heatReadings.sort()
-			log.info("HEAT LOW : "+ heatReadings[0])
-			log.info("HEAT HIGH : "+ heatReadings[heatReadings.size() - 1])
+			def heat = [low:heatReadings[0], high:heatReadings[heatReadings.size() - 1]]
+			readings.put("heat", heat)
+			log.debug("HEAT LOW : "+ heatReadings[0])
+			log.debug("HEAT HIGH : "+ heatReadings[heatReadings.size() - 1])
 		}
 		if (waterGreyReadings.size() > 0) {
-			// TODO not finished the water readings sort for high and low
+			waterGreyReadings.sort()			
+			def greyWater = [low:waterGreyReadings[0], high:waterGreyReadings[waterGreyReadings.size() - 1]]
+			readings.put("greyWater", greyWater)
+			log.debug("GREY LOW : "+ waterGreyReadings[0])
+			log.debug("GREY HIGH : "+ waterGreyReadings[waterGreyReadings.size() - 1])
+			
 			waterHotReadings.sort()
-			waterHotReadings.sort()
-			waterHotReadings.sort()
-			log.info("GREY LOW : "+ waterGreyReadings[0])
-			log.info("GREY HIGH : "+ waterGreyReadings[waterGreyReadings.size() - 1])
-			log.info("HOT LOW : "+ waterHotReadings[0])
-			log.info("HOT HIGH : "+ waterHotReadings[waterHotReadings.size() - 1])
-			log.info("COLD LOW : "+ waterColdReadings[0])
-			log.info("COLD HIGH : "+ waterColdReadings[waterColdReadings.size() - 1])
+			def hotWater = [low:waterHotReadings[0], high:waterHotReadings[waterHotReadings.size() - 1]]
+			readings.put("hotWater", hotWater)
+			log.debug("HOT LOW : "+ waterHotReadings[0])
+			log.debug("HOT HIGH : "+ waterHotReadings[waterHotReadings.size() - 1])
+			
+			waterColdReadings.sort()
+			def coldWater = [low:waterColdReadings[0], high:waterColdReadings[waterColdReadings.size() - 1]]
+			readings.put("coldWater", coldWater)
+			log.debug("COLD LOW : "+ waterColdReadings[0])
+			log.debug("COLD HIGH : "+ waterColdReadings[waterColdReadings.size() - 1])
 		}
+		return readings
 	}
 
 	Map getTrueAverage(int noOfRooms, Date startDate, Date endDate) {

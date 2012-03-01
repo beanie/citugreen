@@ -49,7 +49,7 @@ class BootStrap {
 			SetTopBox stb9 = new SetTopBox(macAddress:'WR:BF:T5:00:EE', TSMid:'6345345', premise:neilsFlat).save()
 		}
 
-		/*
+		
 		if (!ElecReading.count()) {
 			def now = (new Date() - 50)
 
@@ -68,11 +68,15 @@ class BootStrap {
 					ElecReading tmpReading2 = new ElecReading(readingValueElec:random.nextInt(8), fileDate:now, premise:p).save()
 					ElecReading tmpReading3 = new ElecReading(readingValueElec:random.nextInt(8), fileDate:now, premise:p3).save()
 					ElecReading tmpReading4 = new ElecReading(readingValueElec:random.nextInt(8), fileDate:now, premise:p4).save()
-					WaterReading tmpWater = new WaterReading(fileDate:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p).save()
+					WaterReading tmpWater = new WaterReading(fileDate:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p1).save()
+					WaterReading tmpWater1 = new WaterReading(fileDate:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p2).save()
+					WaterReading tmpWater2 = new WaterReading(fileDate:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p3).save()
+					WaterReading tmpWater3 = new WaterReading(fileDate:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p4).save()
+					WaterReading tmpWater4 = new WaterReading(fileDate:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p).save()
 					//HeatReading tmpHeat = new HeatReading(heatReading:random.nextInt(60), heatCost:0, premise:p).save()
 				}
 			}
-		}*/
+		}
     }
     def destroy = {
     }
