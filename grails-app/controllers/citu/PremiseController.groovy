@@ -4,15 +4,21 @@ import java.text.*
 import java.util.Date;
 import java.util.Map;
 
+import net.sourceforge.openforecast.*
+import net.sourceforge.openforecast.models.*
 import org.joda.time.*
 
 import grails.converters.*
 
 class PremiseController extends BaseController {
 
-	def beforeInterceptor = [action:this.&auth, except:["getReadingsByDate", "getReadingsSummary"]]
+	def beforeInterceptor = [action:this.&auth, except:["getReadingsByDate", "getReadingsSummary", "forecast"]]
 
 	def scaffold = true
+	
+	def forecast = {
+		getPredictedPrice()
+	}
 
 	def summary = {
 
@@ -52,59 +58,30 @@ class PremiseController extends BaseController {
 		def Premise premiseInstance = HelperUtil.getPremise(params)
 		
 		if (!premiseInstance) {
+			
 			render("invalid premise ID")
+			
 		} else {
 			
-		TarrifList tarrifList = TarrifList.get(1)
-		
-		def now = new DateTime()
+			def now = new DateTime()
 			now = new DateTime(now.getYear(), now.getMonthOfYear(), now.getDayOfMonth(), 0, 0, 0, 0)
 			def endOfDay = now.plusDays(1).minusSeconds(1)	
-
-			premiseInstance.elecReadings = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), endOfDay.toDate(), [sort:"fileDate", order:"desc"])
-			premiseInstance.waterReadings = WaterReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), endOfDay.toDate(), [sort:"fileDate", order:"desc"])
-			//TODO add Heat query
 			
 			def premise = HelperUtil.createPremiseSkeletonMap(premiseInstance)
+			
+			def sumElec = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ premiseInstance.flatNo +" and reading.fileDate between:date1 AND :date2 ", [date1:now.toDate(), date2:endOfDay.toDate()])
+			def sumWater = WaterReading.executeQuery("select sum(reading.readingValueHot), sum(reading.readingValueCold), sum(reading.readingValueGrey) from WaterReading as reading where reading.premise.flatNo = "+ premiseInstance.flatNo +" and reading.fileDate between:date1 AND :date2 ", [date1:now.toDate(), date2:endOfDay.toDate()])
+			
+			def avgElec = ElecReading.executeQuery("select avg(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ premiseInstance.flatNo +" and reading.fileDate between:date1 AND :date2 ", [date1:now.toDate()-7, date2:now.toDate()])
+			def avgWater = WaterReading.executeQuery("select avg(reading.readingValueHot), avg(reading.readingValueCold), avg(reading.readingValueGrey) from WaterReading as reading where reading.premise.flatNo = "+ premiseInstance.flatNo +" and reading.fileDate between:date1 AND :date2 ", [date1:now.toDate()-7, date2:now.toDate()])
 			def highlows = getHighLow(premiseInstance.bedrooms, now.toDate(), endOfDay.toDate())
 			
-			//TODO neater way to get the sum figure>???
-			//def sumElec = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ i +" and reading.fileDate between:date1 AND :date2 ", [date1:now.toDate(), date2:endOfDay.toDate()])
-
-			def electricity = [:]
-			electricity.put("currentCost", BillUtil.calcTotalElecCost(premiseInstance.elecReadings.readingValueElec))
-			electricity.put("averageCost", (BillUtil.calcTotalElecCost(premiseInstance.elecReadings.readingValueElec)-2))
-			electricity.put("estimateCost", (BillUtil.calcTotalElecCost(premiseInstance.elecReadings.readingValueElec)+5))
-			electricity.put("swingLow", (highlows.elec.low*tarrifList.elecTarrif))
-			electricity.put("swingHigh", (highlows.elec.high*tarrifList.elecTarrif))
-			premise.put("electricity", electricity)
+			premise.put("electricity", HelperUtil.generateElecSummary(sumElec[0], highlows, avgElec[0]))
+			premise.put("hotWater", HelperUtil.generateHotWaterSummary(sumWater[0][0], highlows, avgWater[0][0]))
+			premise.put("coldWater", HelperUtil.generateColdWaterSummary(sumWater[0][1], highlows, avgWater[0][1]))
+			premise.put("greyWater", HelperUtil.generateGreyWaterSummary(sumWater[0][2], highlows, avgWater[0][2]))
 			
-			def greyWater = [:]
-			greyWater.put("currentCost", BillUtil.calcTotalGreyWaterCost(premiseInstance.waterReadings.readingValueGrey))
-			greyWater.put("averageCost", (BillUtil.calcTotalGreyWaterCost(premiseInstance.waterReadings.readingValueGrey)/2))
-			greyWater.put("estimateCost", (BillUtil.calcTotalGreyWaterCost(premiseInstance.waterReadings.readingValueGrey)+1))
-			greyWater.put("swingLow", (highlows.greyWater.low*tarrifList.greyWaterTarrif))
-			greyWater.put("swingHigh", (highlows.greyWater.high*tarrifList.greyWaterTarrif))
-			premise.put("greyWater", greyWater)
-			
-			def coldWater = [:]
-			coldWater.put("currentCost", BillUtil.calcTotalColdWaterCost(premiseInstance.waterReadings.readingValueCold))
-			coldWater.put("averageCost", (BillUtil.calcTotalColdWaterCost(premiseInstance.waterReadings.readingValueCold)/2))
-			coldWater.put("estimateCost", (BillUtil.calcTotalColdWaterCost(premiseInstance.waterReadings.readingValueCold)+1))
-			coldWater.put("swingLow", (highlows.coldWater.low*tarrifList.coldWaterTarrif))
-			coldWater.put("swingHigh", (highlows.coldWater.high*tarrifList.coldWaterTarrif))
-			premise.put("coldWater", coldWater)
-			
-			def hotWater = [:]
-			hotWater.put("currentCost", BillUtil.calcTotalHotWaterCost(premiseInstance.waterReadings.readingValueHot))
-			hotWater.put("averageCost", (BillUtil.calcTotalHotWaterCost(premiseInstance.waterReadings.readingValueHot)/2))
-			hotWater.put("estimateCost", (BillUtil.calcTotalHotWaterCost(premiseInstance.waterReadings.readingValueHot)+1))
-			hotWater.put("swingLow", (highlows.hotWater.low*tarrifList.hotWaterTarrif))
-			hotWater.put("swingHigh", (highlows.hotWater.high*tarrifList.hotWaterTarrif))
-			premise.put("hotWater", hotWater)
-			
-			//premise.put("water", HelperUtil.createWaterMap(premiseInstance))
-			//TODO add Heat map
+			getPredictedPrice()
 			
 			render premise as JSON
 		}
@@ -286,6 +263,131 @@ class PremiseController extends BaseController {
 			log.debug("COLD HIGH : "+ waterColdReadings[waterColdReadings.size() - 1])
 		}
 		return readings
+	}
+	
+	Map getPredictedPrice() {
+
+		def now = new DateTime()
+		now = new DateTime(now.getYear(), now.getMonthOfYear(), now.getDayOfMonth(), 0, 0, 0, 0)
+		def endOfDay = now.plusDays(1).minusSeconds(1)
+		/*
+		def x = 0
+		def y = 7
+		def elecDataSet = new DataSet();
+		
+		def sumElec = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = 610 and reading.fileDate between:date1 AND :date2 ", [date1:now.toDate(), date2:endOfDay.toDate()])
+		def sumElec1 = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = 610 and reading.fileDate between:date1 AND :date2 ", [date1:now.toDate()+1, date2:endOfDay.toDate()+1])
+		def sumElec2 = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = 610 and reading.fileDate between:date1 AND :date2 ", [date1:now.toDate()+2, date2:endOfDay.toDate()+2])
+		def sumElec3 = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = 610 and reading.fileDate between:date1 AND :date2 ", [date1:now.toDate()+3, date2:endOfDay.toDate()+3])
+		
+		log.info(sumElec)
+		
+		Observation elecObservation = new Observation(sumElec[0])
+		elecObservation.setIndependentValue("date", x)
+		elecDataSet.add(elecObservation)
+		
+		Observation elecObservation1 = new Observation(sumElec1[0])
+		elecObservation1.setIndependentValue("date", x)
+		elecDataSet.add(elecObservation1)
+		
+		Observation elecObservation2 = new Observation(sumElec2[0])
+		elecObservation2.setIndependentValue("date", x)
+		elecDataSet.add(elecObservation2)
+		
+		Observation elecObservation3 = new Observation(sumElec3[0])
+		elecObservation3.setIndependentValue("date", x)
+		elecDataSet.add(elecObservation3)
+		
+		log.info(elecDataSet)
+		*/
+		
+		/*
+		while ( y-- > 0 ) {
+			def endOfDay = now.plusDays(1).minusSeconds(1)
+			x++
+			def sumElec = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = 610 and reading.fileDate between:date1 AND :date2 ", [date1:now.toDate(), date2:endOfDay.toDate()])
+			def elecObservation = new Observation(sumElec[0])
+			elecObservation.setIndependentValue("date", x)
+			elecDataSet.add(elecObservation)
+			now = now.plusDays(1)
+		}
+		
+		ForecastingModel model = Forecaster.getBestForecast(elecDataSet)
+		model.init(elecDataSet)
+		
+		DataPoint fcDataPoint4 = new Observation(0.0);
+		fcDataPoint4.setIndependentValue("date", x++);
+		
+		// Create forecast data set and add these DataPoints
+		DataSet fcDataSet = new DataSet();
+		fcDataSet.add(fcDataPoint4);
+		
+		Iterator itt = fcDataSet.iterator();
+		Double value=0.0;
+		while (itt.hasNext()) {
+			DataPoint dp = (DataPoint) itt.next();
+			double forecastValue = dp.getDependentValue();
+			value = forecastValue;
+		}
+		
+		model.forecast(fcDataPoint4);
+		log.info(BillUtil.calcElecPriceByVolume(fcDataPoint4.getDependentValue()));
+		*/
+		def x = 0
+		def y = 7
+		
+		def tmpObj = "observation"
+		
+		while ( y-- > 0 ) {
+			def tmpObj1 = tmpObj+x
+			log.info(tmpObj1)
+			x++
+		}
+		
+		/*
+		def sumElec = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = 610 and reading.fileDate between:date1 AND :date2 ", [date1:now.toDate(), date2:endOfDay.toDate()])
+
+		
+		// Create Observation for temperature measured on 2009/12/20
+		Observation observation1 = new Observation(13.0)
+		observation1.setIndependentValue("year",2009)
+		observation1.setIndependentValue("month", 12)
+		observation1.setIndependentValue("date", 20)
+		
+		// Create Observation for temperature measured on 2009/12/21
+		Observation observation2 = new Observation(39.0)
+		observation2.setIndependentValue("year", 2009)
+		observation2.setIndependentValue("month", 12)
+		observation2.setIndependentValue("date", 21)
+		
+		// Create Observation for temperature measured on 2009/12/22
+		Observation observation3 = new Observation(42.0)
+		observation3.setIndependentValue("year", 2009)
+		observation3.setIndependentValue("month", 12)
+		observation3.setIndependentValue("date", 22)
+		
+		DataSet dataSet = new DataSet();
+		
+		// Add Observations to the DataSet
+		dataSet.add(observation1)
+		dataSet.add(observation2)
+		dataSet.add(observation3)
+		
+		ForecastingModel model = Forecaster.getBestForecast(dataSet)
+		model.init(dataSet)
+		
+		DataPoint fcDataPoint4 = new Observation(0.0);
+		fcDataPoint4.setIndependentValue("year", 2009);
+		fcDataPoint4.setIndependentValue("month", 12);
+		fcDataPoint4.setIndependentValue("date", 23);
+		
+		// Create forecast data set and add these DataPoints
+		DataSet fcDataSet = new DataSet();
+		fcDataSet.add(fcDataPoint4);
+		
+		model.forecast(fcDataPoint4);
+		//System.out.println(fcDataPoint4.getDependentValue());*/
+			
 	}
 
 	Map getTrueAverage(int noOfRooms, Date startDate, Date endDate) {

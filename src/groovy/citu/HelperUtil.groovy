@@ -23,6 +23,53 @@ class HelperUtil {
 		return premise
 	}
 	
+	static Map generateElecSummary(Double sum, Map highlows, Double avg) {
+		def electricity = [:]
+		electricity.put("currentCost", BillUtil.calcElecPriceByVolume(sum))
+		electricity.put("averageCost", BillUtil.calcElecPriceByVolume(avg*24))
+		electricity.put("estimateCost", BillUtil.calcElecPriceByVolume(sum+5))
+		electricity.put("swingLow", BillUtil.calcElecPriceByVolume(highlows.elec.low))
+		electricity.put("swingHigh", BillUtil.calcElecPriceByVolume(highlows.elec.high))
+		return electricity
+	}
+	
+	static Map generateColdWaterSummary(Double sum, Map highlows, Double avg) {
+		def coldWater = [:]
+		coldWater.put("currentCost", BillUtil.calcColdWaterPriceByVolume(sum))
+		coldWater.put("averageCost", BillUtil.calcColdWaterPriceByVolume(avg*24))
+		coldWater.put("estimateCost", BillUtil.calcColdWaterPriceByVolume(sum+1))
+		coldWater.put("swingLow", BillUtil.calcColdWaterPriceByVolume(highlows.coldWater.low))
+		coldWater.put("swingHigh", BillUtil.calcColdWaterPriceByVolume(highlows.coldWater.high))
+		return coldWater
+	}
+	
+	static Map generateHotWaterSummary(Double sum, Map highlows, Double avg) {
+		def hotWater = [:]
+		hotWater.put("currentCost", BillUtil.calcHotWaterPriceByVolume(sum))
+		hotWater.put("averageCost", BillUtil.calcHotWaterPriceByVolume(avg*24))
+		hotWater.put("estimateCost", BillUtil.calcHotWaterPriceByVolume(sum+1))
+		hotWater.put("swingLow", BillUtil.calcHotWaterPriceByVolume(highlows.hotWater.low))
+		hotWater.put("swingHigh", BillUtil.calcHotWaterPriceByVolume(highlows.hotWater.high))
+		return hotWater
+	}
+	
+	static Map generateGreyWaterSummary(Double sum, Map highlows, Double avg) {
+		def greyWater = [:]
+		greyWater.put("currentCost", BillUtil.calcGreyWaterPriceByVolume(sum))
+		greyWater.put("averageCost", BillUtil.calcGreyWaterPriceByVolume(avg*24))
+		greyWater.put("estimateCost", BillUtil.calcGreyWaterPriceByVolume(sum+1))
+		greyWater.put("swingLow", BillUtil.calcGreyWaterPriceByVolume(highlows.greyWater.low))
+		greyWater.put("swingHigh", BillUtil.calcGreyWaterPriceByVolume(highlows.greyWater.high))
+		return greyWater
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 	static Map createElectricityMap(Premise premiseInstance) {
 		ArrayList electricityReadings = new ArrayList()
 		premiseInstance.elecReadings.each { reading ->

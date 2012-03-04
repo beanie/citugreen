@@ -59,7 +59,9 @@ class BootStrap {
 			Premise p3 = Premise.findByFlatNo("608")
 			Premise p4 = Premise.findByFlatNo("610")
 
+			
 			def random = new Random()
+			
 			50.times {
 				now = (now + 1)
 				24.times{
@@ -76,6 +78,7 @@ class BootStrap {
 					//HeatReading tmpHeat = new HeatReading(heatReading:random.nextInt(60), heatCost:0, premise:p).save()
 				}
 			}
+			
 		}
     }
     def destroy = {

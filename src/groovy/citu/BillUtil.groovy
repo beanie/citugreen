@@ -37,5 +37,21 @@ class BillUtil {
 	static Float aveHotWaterByRoom(ArrayList costs, int rooms) {
 		return (calcTotalColdWaterCost(costs)/rooms)
 	}
+	
+	static Float calcElecPriceByVolume(Double reading) {
+		return (reading*tarrifList.elecTarrif)
+	}
+	
+	static Float calcHotWaterPriceByVolume(Double reading) {
+		return (reading*tarrifList.hotWaterTarrif)
+	}
+	
+	static Float calcColdWaterPriceByVolume(Double reading) {
+		return (reading*tarrifList.coldWaterTarrif)
+	}
+	
+	static Float calcGreyWaterPriceByVolume(Double reading) {
+		return (reading*tarrifList.greyWaterTarrif)
+	}
 
 }
