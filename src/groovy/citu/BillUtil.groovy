@@ -39,7 +39,11 @@ class BillUtil {
 	}
 	
 	static Float calcElecPriceByVolume(Double reading) {
-		return (reading*tarrifList.elecTarrif)
+		if (reading) {
+			return (reading*tarrifList.elecTarrif)
+		} else {
+			return 0
+		}
 	}
 	
 	static Float calcHotWaterPriceByVolume(Double reading) {

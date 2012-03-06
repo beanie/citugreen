@@ -53,6 +53,9 @@ class PremiseController extends BaseController {
 		}
 	}
 	
+	/*
+	 * Get the reading summary view for the landing page
+	 */
 	def getReadingsSummary = {
 		
 		def Premise premiseInstance = HelperUtil.getPremise(params)
@@ -69,11 +72,18 @@ class PremiseController extends BaseController {
 			
 			def premise = HelperUtil.createPremiseSkeletonMap(premiseInstance)
 			
+			/*
+			 * Pull back the sums for the summary
+			 */
 			def sumElec = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ premiseInstance.flatNo +" and reading.fileDate between:date1 AND :date2 ", [date1:now.toDate(), date2:endOfDay.toDate()])
 			def sumWater = WaterReading.executeQuery("select sum(reading.readingValueHot), sum(reading.readingValueCold), sum(reading.readingValueGrey) from WaterReading as reading where reading.premise.flatNo = "+ premiseInstance.flatNo +" and reading.fileDate between:date1 AND :date2 ", [date1:now.toDate(), date2:endOfDay.toDate()])
 			
+			/*
+			 * Pull back the avg for the summary from today minus 7 days
+			 */
 			def avgElec = ElecReading.executeQuery("select avg(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ premiseInstance.flatNo +" and reading.fileDate between:date1 AND :date2 ", [date1:now.toDate()-7, date2:now.toDate()])
 			def avgWater = WaterReading.executeQuery("select avg(reading.readingValueHot), avg(reading.readingValueCold), avg(reading.readingValueGrey) from WaterReading as reading where reading.premise.flatNo = "+ premiseInstance.flatNo +" and reading.fileDate between:date1 AND :date2 ", [date1:now.toDate()-7, date2:now.toDate()])
+			
 			def highlows = getHighLow(premiseInstance.bedrooms, now.toDate(), endOfDay.toDate())
 			
 			premise.put("electricity", HelperUtil.generateElecSummary(sumElec[0], highlows, avgElec[0]))
@@ -128,14 +138,19 @@ class PremiseController extends BaseController {
 
 		def premise = HelperUtil.createPremiseSkeletonMap(premiseInstance)
 
-		def averages = [:]
-
 		if (viewType.equals("day"))	{
 
 			def endOfDay = now.plusDays(1).minusSeconds(1)
+			def swingData = [:]
 
 			if (utilType.equals("elec")) {
 				premiseInstance.elecReadings = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), endOfDay.toDate(), [sort:"fileDate", order:"desc"])
+				swingData = getElecSwingometer(premiseInstance.bedrooms, now.toDate(), endOfDay.toDate())
+				if (premiseInstance.elecReadings.size() > 0) {
+					HelperUtil.createElectricityMap(premiseInstance, premise, swingData)
+				} else {
+					premise = ["error":"No Data for specified period"]
+				}
 			} else if (utilType.equals("water")) {
 				premiseInstance.waterReadings = WaterReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), endOfDay.toDate(), [sort:"fileDate", order:"desc"])
 			} else if (utilType.equals("water")) {
@@ -146,10 +161,12 @@ class PremiseController extends BaseController {
 		
 			ArrayList electricityReadings = new ArrayList()
 			ArrayList waterReadings = new ArrayList()
+			def swingData = [:]
 		
 			if (viewType.equals("week")) {
 				
 				now = now.withDayOfWeek(DateTimeConstants.MONDAY)
+				swingData = getElecSwingometer(premiseInstance.bedrooms, now.toDate(), now.plusWeeks(1).minusSeconds(1).toDate())
 				
 				7.times {
 					def endOfDay = now.plusDays(1).minusSeconds(1)
@@ -163,8 +180,7 @@ class PremiseController extends BaseController {
 			} else if (viewType.equals("month")) {
 				
 				def monthDays = now.dayOfMonth().getMaximumValue()
-				//averages = getTrueAverage(premiseInstance.bedrooms, now.toDate(), now.plusMonths(1).minusSeconds(1).toDate())
-				//getMaxMinAverage(premiseInstance.bedrooms, now.toDate(), now.plusMonths(1).minusSeconds(1).toDate())
+				swingData = getElecSwingometer(premiseInstance.bedrooms, now.toDate(), now.plusMonths(1).minusSeconds(1).toDate())
 				4.times {
 					def endOfWeek = now.plusDays(7).minusSeconds(1)
 					def elecWeek = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), endOfWeek.toDate(), [sort:"fileDate", order:"desc"])
@@ -185,6 +201,7 @@ class PremiseController extends BaseController {
 				}
 				
 			} else if (viewType.equals("year")) {
+				swingData = getElecSwingometer(premiseInstance.bedrooms, now.toDate(), now.plusYears(1).minusSeconds(1).toDate())
 				12.times {
 					def monthDays = now.dayOfMonth().getMaximumValue()
 					def monthEnd = now.plusDays((monthDays - now.getDayOfMonth())+1).minusSeconds(1)
@@ -199,7 +216,11 @@ class PremiseController extends BaseController {
 			}
 			if (utilType.equals("elec")) {
 				premiseInstance.elecReadings = electricityReadings
-				premise.put("electricity", HelperUtil.createElectricityMap(premiseInstance))
+				if (premiseInstance.elecReadings.size() > 0) {
+					HelperUtil.createElectricityMap(premiseInstance, premise, swingData)
+				} else {
+					premise = ["error":"No Data for specified period"]
+				}
 			} else if (utilType.equals("water")) {
 				premiseInstance.waterReadings = waterReadings
 				premise.put("water", HelperUtil.createWaterMap(premiseInstance))
@@ -208,6 +229,33 @@ class PremiseController extends BaseController {
 			}
 		}
 		return premise
+	}
+
+	Map getElecSwingometer (int noOfRooms, Date startDate, Date endDate) {
+		def premises = Premise.executeQuery("select p.flatNo from Premise p where bedrooms = "+ noOfRooms)
+		def tmpElecFloat = 0
+		def elecReadings = new ArrayList()
+		def swingometer = [:]
+		for (i in premises) {
+			def sumElec = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ i +" and reading.fileDate between:date1 AND :date2 ", [date1:startDate, date2:endDate])
+			// ignore Elec for empty values
+			if (sumElec[0]) {
+				tmpElecFloat = (tmpElecFloat + sumElec[0])
+				elecReadings.add(sumElec[0])
+			}
+		}
+		if (elecReadings.size() > 0) {
+			elecReadings.sort()
+			swingometer.put("swingLow", BillUtil.calcElecPriceByVolume(elecReadings[0]))
+			swingometer.put("swingHigh", BillUtil.calcElecPriceByVolume(elecReadings[elecReadings.size() - 1]))
+			swingometer.put("peerAvg", (tmpElecFloat / elecReadings.size()))
+		} else {
+			swingometer.put("swingLow", 0)
+			swingometer.put("swingHigh", 0)
+			swingometer.put("peerAvg", 0)
+		}
+		
+		return swingometer
 	}
 	
 	Map getHighLow(int noOfRooms, Date startDate, Date endDate) {
@@ -252,7 +300,7 @@ class PremiseController extends BaseController {
 			log.debug("HEAT HIGH : "+ heatReadings[heatReadings.size() - 1])
 		}
 		if (waterGreyReadings.size() > 0) {
-			waterGreyReadings.sort()			
+			waterGreyReadings.sort()
 			def greyWater = [low:waterGreyReadings[0], high:waterGreyReadings[waterGreyReadings.size() - 1]]
 			readings.put("greyWater", greyWater)
 			log.debug("GREY LOW : "+ waterGreyReadings[0])
@@ -396,67 +444,6 @@ class PremiseController extends BaseController {
 		model.forecast(fcDataPoint4);
 		//System.out.println(fcDataPoint4.getDependentValue());*/
 			
-	}
-
-	Map getTrueAverage(int noOfRooms, Date startDate, Date endDate) {
-		def premises = Premise.executeQuery("select p.flatNo from Premise p where bedrooms = "+ noOfRooms)
-		def averages = [:]
-		def tmpElecFloat = 0
-		def tmpHeatFloat = 0
-		def tmpGreyFloat = 0
-		def tmpColdFloat = 0
-		def tmpHotFloat = 0
-		def heatReadings = new ArrayList()
-		def waterHotReadings = new ArrayList()
-		def waterColdReadings = new ArrayList()
-		def waterGreyReadings = new ArrayList()
-		def elecReadings = new ArrayList()
-		for (i in premises) {
-			def sumElec = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ i +" and reading.fileDate between:date1 AND :date2 ", [date1:startDate, date2:endDate])
-			def sumHeat = HeatReading.executeQuery("select sum(reading.readingValueHeat) from HeatReading as reading where reading.premise.flatNo = "+ i +" and reading.dateCreated between:date1 AND :date2 ", [date1:startDate, date2:endDate])
-			def sumWater = WaterReading.executeQuery("select sum(reading.readingValueHot), sum(reading.readingValueCold), sum(reading.readingValueGrey) from WaterReading as reading where reading.premise.flatNo = "+ i +" and reading.fileDate between:date1 AND :date2 ", [date1:startDate, date2:endDate])
-			// ignore Elec for empty values			
-			if (sumElec[0]) {
-				tmpElecFloat = (tmpElecFloat + sumElec[0])
-				elecReadings.add(sumElec[0])
-			}
-			// ignore Heat for empty values
-			if (sumHeat[0]) {
-				tmpHeatFloat = (tmpHeatFloat + sumHeat[0])
-				heatReadings.add(sumHeat[0])
-			}
-			// ignore Water for empty values
-			if (sumWater[0][2]) {
-				tmpHotFloat = (tmpHotFloat + sumWater[0][0])
-				tmpColdFloat = (tmpColdFloat + sumWater[0][1])
-				tmpGreyFloat = (tmpGreyFloat + sumWater[0][2])
-				waterHotReadings.add(sumWater[0][0])
-				waterColdReadings.add(sumWater[0][1])
-				waterGreyReadings.add(sumWater[0][2])
-			}
-		}
-		if (elecReadings.size() > 0) {
-			elecReadings.sort()
-			log.info("ELEC LOW : "+ elecReadings[0])
-			log.info("ELEC HIGH : "+ elecReadings[elecReadings.size() - 1])
-			averages.put("averageElec", (tmpElecFloat / elecReadings.size()))
-		}
-		if (heatReadings.size() > 0) {
-			heatReadings.sort()
-			log.info("HEAT LOW : "+ heatReadings[0])
-			log.info("HEAT HIGH : "+ heatReadings[heatReadings.size() - 1])
-			averages.put("averageHeat", (tmpHeatFloat / heatReadings.size()))
-		}
-		if (waterGreyReadings.size() > 0) {
-			// TODO not finished the water readings sort for high and low
-			waterHotReadings.sort()
-			waterHotReadings.sort()
-			waterHotReadings.sort()
-			averages.put("averageWaterHot", (tmpHotFloat / waterHotReadings.size()))
-			averages.put("averageColdHot", (tmpColdFloat / waterColdReadings.size()))
-			averages.put("averageGreyHot", (tmpGreyFloat / waterGreyReadings.size()))
-		}
-		return averages
 	}
 
 }

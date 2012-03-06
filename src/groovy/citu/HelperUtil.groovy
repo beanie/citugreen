@@ -27,7 +27,7 @@ class HelperUtil {
 		def electricity = [:]
 		electricity.put("currentCost", BillUtil.calcElecPriceByVolume(sum))
 		electricity.put("averageCost", BillUtil.calcElecPriceByVolume(avg*24))
-		electricity.put("estimateCost", BillUtil.calcElecPriceByVolume(sum+5))
+		electricity.put("estimateCost", BillUtil.calcElecPriceByVolume(sum+2))
 		electricity.put("swingLow", BillUtil.calcElecPriceByVolume(highlows.elec.low))
 		electricity.put("swingHigh", BillUtil.calcElecPriceByVolume(highlows.elec.high))
 		return electricity
@@ -63,27 +63,26 @@ class HelperUtil {
 		return greyWater
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	static Map createElectricityMap(Premise premiseInstance) {
+	static Map createElectricityMap(Premise premiseInstance, Map premise, Map swingData) {
 		ArrayList electricityReadings = new ArrayList()
 		premiseInstance.elecReadings.each { reading ->
 			electricityReadings.add([readingValue:reading.readingValueElec, dateTime:reading.fileDate])
 		}
-		def electricity = [:]
-		electricity.put("elecReadings", electricityReadings)
-		electricity.put("elecTotalUsage", BillUtil.calcTotal(premiseInstance.elecReadings.readingValueElec))
-		electricity.put("elecTotalCost", BillUtil.calcTotalElecCost(premiseInstance.elecReadings.readingValueElec))
-		electricity.put("elecAverageUsage", (electricity.elecTotalUsage/electricityReadings.size()))
-		electricity.put("elecAverageCost", (electricity.elecTotalCost/electricityReadings.size()))
-		return electricity
+		premise.put("readings", electricityReadings)
+		premise.put("elecTotalUsage", BillUtil.calcTotal(premiseInstance.elecReadings.readingValueElec)) //done
+		premise.put("elecTotalCost", BillUtil.calcTotalElecCost(premiseInstance.elecReadings.readingValueElec)) //done
+		premise.put("elecAverageCost", BillUtil.calcElecPriceByVolume((premise.elecTotalUsage/premiseInstance.elecReadings.size())*premiseInstance.elecReadings.size()))
+		premise.put("elecSwingLow", swingData.swingLow) //done
+		premise.put("elecSwingHigh", swingData.swingHigh) //done
+		premise.put("elecEstimatedCost", "TODO")
+		premise.put("elecAvgUsage", premise.elecTotalUsage/premiseInstance.elecReadings.size()) //done
+		premise.put("elecPeerAvg", swingData.peerAvg/premiseInstance.elecReadings.size())
+		return premise
 	}
 
+	
+	
+	
 	static Map createWaterMap(Premise premiseInstance) {
 		ArrayList waterReadings = new ArrayList()
 		premiseInstance.waterReadings.each { reading ->
