@@ -100,9 +100,9 @@ class HelperUtil {
 		water.put("waterAverageUsageHot", (water.waterTotalUsageHot/waterReadings.size()))
 		water.put("waterAverageUsageCold", (water.waterTotalUsageCold/waterReadings.size()))
 		water.put("waterAverageUsageGrey", (water.waterTotalUsageGrey/waterReadings.size()))
-		water.put("waterAverageCostHot", (water.waterTotalCostHot/waterReadings.size()))
-		water.put("waterAverageCostCold", (water.waterTotalCostCold/waterReadings.size()))
-		water.put("waterAverageCostGrey", (water.waterTotalCostGrey/waterReadings.size()))
+		//water.put("waterAverageCostHot", (water.waterTotalCostHot/waterReadings.size()))
+		//water.put("waterAverageCostCold", (water.waterTotalCostCold/waterReadings.size()))
+		//water.put("waterAverageCostGrey", (water.waterTotalCostGrey/waterReadings.size()))
 		//water.put("waterCombinedTotalCost", (water.waterTotalCostHot + water.waterTotalCostCold + water.waterTotalCostGrey))
 		return water
 	}

@@ -4,7 +4,6 @@ class BootStrap {
 
     def init = { servletContext ->
 		if (!EnergyFileRef.count()) {
-
 			
 			def xml1 = new EnergyFileRef(urlPath:'http://office.citu.co.uk:9020/xmlwater3.xml', category:'Water').save()
 			def xml2 = new EnergyFileRef(urlPath:'http://office.citu.co.uk:9021/xmlwater4.xml', category:'Water').save()

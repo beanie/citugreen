@@ -81,7 +81,7 @@ class PremiseController extends BaseController {
 			premise.put("coldWater", HelperUtil.generateColdWaterSummary(sumWater[0][1], highlows, avgWater[0][1]))
 			premise.put("greyWater", HelperUtil.generateGreyWaterSummary(sumWater[0][2], highlows, avgWater[0][2]))
 			
-			getPredictedPrice()
+			// TODO getPredictedPrice()
 			
 			render premise as JSON
 		}
@@ -101,21 +101,21 @@ class PremiseController extends BaseController {
 
 			if (params.week) {
 				log.info("simpleViewMap - Week View - with date : "+ now)
-				view = createViewJsonObject(premiseInstance, now, "week")
+				view = createViewJsonObject(premiseInstance, now, "week", params.utilType)
 			} else {
 				log.info("simpleViewMap - Day View - with date : "+ now)
-				view = createViewJsonObject(premiseInstance, now, "day")
+				view = createViewJsonObject(premiseInstance, now, "day", params.utilType)
 			}
 		} else if (params.month && params.year) {
 
 			now = new DateTime(params.int("year"), params.int("month"), 1, 0, 0, 0, 0)
 			log.info("simpleViewMap - Month View - with date : "+ now)
-			view = createViewJsonObject(premiseInstance, now, "month")
+			view = createViewJsonObject(premiseInstance, now, "month", params.utilType)
 		} else if (params.year) {
 
 			now = new DateTime(params.int("year"), 1, 1, 0, 0, 0, 0)
 			log.info("simpleViewMap - Year View - with date : "+ now)
-			view = createViewJsonObject(premiseInstance, now, "year")
+			view = createViewJsonObject(premiseInstance, now, "year", params.utilType)
 		} else {
 			log.warn("Invalid date params sent")
 			return null
@@ -124,9 +124,9 @@ class PremiseController extends BaseController {
 		return view
 	}
 
-	Map createViewJsonObject(Premise premiseInstance, DateTime now, String viewType) {
+	Map createViewJsonObject(Premise premiseInstance, DateTime now, String viewType, String utilType) {
 
-		def premise = createPremiseSkeletonMap(premiseInstance)
+		def premise = HelperUtil.createPremiseSkeletonMap(premiseInstance)
 
 		def averages = [:]
 
@@ -134,71 +134,79 @@ class PremiseController extends BaseController {
 
 			def endOfDay = now.plusDays(1).minusSeconds(1)
 
-			premiseInstance.elecReadings = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), endOfDay.toDate(), [sort:"fileDate", order:"desc"])
-			premiseInstance.waterReadings = WaterReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), endOfDay.toDate(), [sort:"fileDate", order:"desc"])
+			if (utilType.equals("elec")) {
+				premiseInstance.elecReadings = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), endOfDay.toDate(), [sort:"fileDate", order:"desc"])
+			} else if (utilType.equals("water")) {
+				premiseInstance.waterReadings = WaterReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), endOfDay.toDate(), [sort:"fileDate", order:"desc"])
+			} else if (utilType.equals("water")) {
+				// TODO heat stub
+			}
 		
-		} else if (viewType.equals("week")) {
-
-			now = now.withDayOfWeek(DateTimeConstants.MONDAY)
+		} else {
+		
 			ArrayList electricityReadings = new ArrayList()
 			ArrayList waterReadings = new ArrayList()
-			7.times {
-				def endOfDay = now.plusDays(1).minusSeconds(1)
-				def elecDay = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), endOfDay.toDate(), [sort:"fileDate", order:"desc"])
-				def waterDay = WaterReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), endOfDay.toDate(), [sort:"fileDate", order:"desc"])
-				electricityReadings.add(new ElecReading(readingValueElec:BillUtil.calcTotal(elecDay.readingValueElec), fileDate:now.toDate()))
-				waterReadings.add(new WaterReading(readingValueHot:BillUtil.calcTotal(waterDay.readingValueHot), readingValueCold:BillUtil.calcTotal(waterDay.readingValueCold), readingValueGrey:BillUtil.calcTotal(waterDay.readingValueGrey), fileDate:now.toDate()))
-				now = now.plusDays(1)
-			}
-			premiseInstance.elecReadings = electricityReadings
-			premiseInstance.waterReadings = waterReadings
 		
-		} else if (viewType.equals("month")) {
+			if (viewType.equals("week")) {
+				
+				now = now.withDayOfWeek(DateTimeConstants.MONDAY)
+				
+				7.times {
+					def endOfDay = now.plusDays(1).minusSeconds(1)
+					def elecDay = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), endOfDay.toDate(), [sort:"fileDate", order:"desc"])
+					electricityReadings.add(new ElecReading(readingValueElec:BillUtil.calcTotal(elecDay.readingValueElec), fileDate:now.toDate()))
+					def waterDay = WaterReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), endOfDay.toDate(), [sort:"fileDate", order:"desc"])
+					waterReadings.add(new WaterReading(readingValueHot:BillUtil.calcTotal(waterDay.readingValueHot), readingValueCold:BillUtil.calcTotal(waterDay.readingValueCold), readingValueGrey:BillUtil.calcTotal(waterDay.readingValueGrey), fileDate:now.toDate()))
+					now = now.plusDays(1)
+				}
 			
-			ArrayList electricityReadings = new ArrayList()
-			ArrayList waterReadings = new ArrayList()
-			def monthDays = now.dayOfMonth().getMaximumValue()
-			averages = getTrueAverage(premiseInstance.bedrooms, now.toDate(), now.plusMonths(1).minusSeconds(1).toDate())
-			//getMaxMinAverage(premiseInstance.bedrooms, now.toDate(), now.plusMonths(1).minusSeconds(1).toDate())
-			4.times {
-				def endOfWeek = now.plusDays(7).minusSeconds(1)
-				def elecWeek = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), endOfWeek.toDate(), [sort:"fileDate", order:"desc"])
-				def waterWeek = WaterReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), endOfWeek.toDate(), [sort:"fileDate", order:"desc"])
-				log.info("Dates : "+ now.toDate() +" : "+ endOfWeek.toDate() +" values : "+ BillUtil.calcTotal(elecWeek.readingValueElec))
-				electricityReadings.add(new ElecReading(readingValueElec:BillUtil.calcTotal(elecWeek.readingValueElec), fileDate:now.toDate()))
-				waterReadings.add(new WaterReading(readingValueHot:BillUtil.calcTotal(waterWeek.readingValueHot), readingValueCold:BillUtil.calcTotal(waterWeek.readingValueCold), readingValueGrey:BillUtil.calcTotal(waterWeek.readingValueGrey), fileDate:now.toDate()))
-				now = now.plusDays(7)
-			}
-
-			if (monthDays > 28) {
-				def diff = now.plusDays((monthDays - now.getDayOfMonth())+1).minusSeconds(1)
-				def elecWeek = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), diff.toDate(), [sort:"fileDate", order:"desc"])
-				def waterWeek = WaterReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), diff.toDate(), [sort:"fileDate", order:"desc"])
-				log.info("Dates : "+ now.toDate() +" : "+ diff.toDate() +" values : "+ BillUtil.calcTotal(elecWeek.readingValueElec))
-				electricityReadings.add(new ElecReading(readingValueElec:BillUtil.calcTotal(elecWeek.readingValueElec), fileDate:now.toDate()))
-				waterReadings.add(new WaterReading(readingValueHot:BillUtil.calcTotal(waterWeek.readingValueHot), readingValueCold:BillUtil.calcTotal(waterWeek.readingValueCold), readingValueGrey:BillUtil.calcTotal(waterWeek.readingValueGrey), fileDate:now.toDate()))
-			}
-			premiseInstance.elecReadings = electricityReadings
-			premiseInstance.waterReadings = waterReadings
-		} else if (viewType.equals("year")) {
-			ArrayList electricityReadings = new ArrayList()
-			ArrayList waterReadings = new ArrayList()
-			12.times {
+			} else if (viewType.equals("month")) {
+				
 				def monthDays = now.dayOfMonth().getMaximumValue()
-				def monthEnd = now.plusDays((monthDays - now.getDayOfMonth())+1).minusSeconds(1)
-				def elecMonth = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), monthEnd.toDate(), [sort:"fileDate", order:"desc"])
-				def waterMonth = WaterReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), monthEnd.toDate(), [sort:"fileDate", order:"desc"])
-				log.info("Dates : "+ now.toDate() +" : "+ monthEnd.toDate())
-				electricityReadings.add(new ElecReading(readingValueElec:BillUtil.calcTotal(elecMonth.readingValueElec), fileDate:now.toDate()))
-				waterReadings.add(new WaterReading(readingValueHot:BillUtil.calcTotal(waterMonth.readingValueHot), readingValueCold:BillUtil.calcTotal(waterMonth.readingValueCold), readingValueGrey:BillUtil.calcTotal(waterMonth.readingValueGrey), fileDate:now.toDate()))
-				now = now.plusMonths(1)
+				//averages = getTrueAverage(premiseInstance.bedrooms, now.toDate(), now.plusMonths(1).minusSeconds(1).toDate())
+				//getMaxMinAverage(premiseInstance.bedrooms, now.toDate(), now.plusMonths(1).minusSeconds(1).toDate())
+				4.times {
+					def endOfWeek = now.plusDays(7).minusSeconds(1)
+					def elecWeek = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), endOfWeek.toDate(), [sort:"fileDate", order:"desc"])
+					def waterWeek = WaterReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), endOfWeek.toDate(), [sort:"fileDate", order:"desc"])
+					log.debug("Dates : "+ now.toDate() +" : "+ endOfWeek.toDate() +" values : "+ BillUtil.calcTotal(elecWeek.readingValueElec))
+					electricityReadings.add(new ElecReading(readingValueElec:BillUtil.calcTotal(elecWeek.readingValueElec), fileDate:now.toDate()))
+					waterReadings.add(new WaterReading(readingValueHot:BillUtil.calcTotal(waterWeek.readingValueHot), readingValueCold:BillUtil.calcTotal(waterWeek.readingValueCold), readingValueGrey:BillUtil.calcTotal(waterWeek.readingValueGrey), fileDate:now.toDate()))
+					now = now.plusDays(7)
+				}
+	
+				if (monthDays > 28) {
+					def diff = now.plusDays((monthDays - now.getDayOfMonth())+1).minusSeconds(1)
+					def elecWeek = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), diff.toDate(), [sort:"fileDate", order:"desc"])
+					def waterWeek = WaterReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), diff.toDate(), [sort:"fileDate", order:"desc"])
+					log.debug("Dates : "+ now.toDate() +" : "+ diff.toDate() +" values : "+ BillUtil.calcTotal(elecWeek.readingValueElec))
+					electricityReadings.add(new ElecReading(readingValueElec:BillUtil.calcTotal(elecWeek.readingValueElec), fileDate:now.toDate()))
+					waterReadings.add(new WaterReading(readingValueHot:BillUtil.calcTotal(waterWeek.readingValueHot), readingValueCold:BillUtil.calcTotal(waterWeek.readingValueCold), readingValueGrey:BillUtil.calcTotal(waterWeek.readingValueGrey), fileDate:now.toDate()))
+				}
+				
+			} else if (viewType.equals("year")) {
+				12.times {
+					def monthDays = now.dayOfMonth().getMaximumValue()
+					def monthEnd = now.plusDays((monthDays - now.getDayOfMonth())+1).minusSeconds(1)
+					def elecMonth = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), monthEnd.toDate(), [sort:"fileDate", order:"desc"])
+					def waterMonth = WaterReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), monthEnd.toDate(), [sort:"fileDate", order:"desc"])
+					log.debug("Dates : "+ now.toDate() +" : "+ monthEnd.toDate())
+					electricityReadings.add(new ElecReading(readingValueElec:BillUtil.calcTotal(elecMonth.readingValueElec), fileDate:now.toDate()))
+					waterReadings.add(new WaterReading(readingValueHot:BillUtil.calcTotal(waterMonth.readingValueHot), readingValueCold:BillUtil.calcTotal(waterMonth.readingValueCold), readingValueGrey:BillUtil.calcTotal(waterMonth.readingValueGrey), fileDate:now.toDate()))
+					now = now.plusMonths(1)
+				}
+				
 			}
-			premiseInstance.elecReadings = electricityReadings
-			premiseInstance.waterReadings = waterReadings
+			if (utilType.equals("elec")) {
+				premiseInstance.elecReadings = electricityReadings
+				premise.put("electricity", HelperUtil.createElectricityMap(premiseInstance))
+			} else if (utilType.equals("water")) {
+				premiseInstance.waterReadings = waterReadings
+				premise.put("water", HelperUtil.createWaterMap(premiseInstance))
+			} else if (utilType.equals("heat")) {
+				// TODO heat stub
+			}
 		}
-		premise.put("electricity", HelperUtil.createElectricityMap(premiseInstance))
-		premise.put("water", HelperUtil.createWaterMap(premiseInstance))
-		premise.put("buildingTotalAveragesForPeriod", averages)
 		return premise
 	}
 	
@@ -234,7 +242,7 @@ class PremiseController extends BaseController {
 			def elec = [low:elecReadings[0], high:elecReadings[elecReadings.size() - 1]]
 			readings.put("elec", elec)
 			log.debug("ELEC LOW : "+ elecReadings[0])
-			log.debug("ELEC HIGH : "+ elecReadings[elecReadings.size() - 1])
+			log.debug("Elec HIGH : "+ elecReadings[elecReadings.size() - 1])
 		}
 		if (heatReadings.size() > 0) {
 			heatReadings.sort()
@@ -340,7 +348,7 @@ class PremiseController extends BaseController {
 		
 		while ( y-- > 0 ) {
 			def tmpObj1 = tmpObj+x
-			log.info(tmpObj1)
+			//log.info(tmpObj1)
 			x++
 		}
 		
