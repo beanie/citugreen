@@ -58,38 +58,16 @@
                         <tr class="prop">
                             
                             <td valign="top" class="yui-skin-sam" colspan="2" align="center">
-								
-								<%
-								
-								def elecGraphData = []
-								for (i in simpleView.electricity.elecReadings) {
-									def dataObj = [[DateFormat.getDateInstance(DateFormat.SHORT).format(i.dateTime), i.readingValue]]
-									elecGraphData += dataObj
-								}
-								def waterGraphData = []
-								for (i in simpleView.water.waterReadings) {
-									def dataObj = [[DateFormat.getDateInstance(DateFormat.SHORT).format(i.dateTime), i.readingValueCold, i.readingValueHot, i.readingValueGrey]]
-									waterGraphData += dataObj
-								}
-								/*
-								def heatGraphData = []
-								for (i in premiseInstance.heatReadings) {
-									def dataObj = [[DateFormat.getDateInstance(DateFormat.SHORT).format(i.dateCreated), i.readingValueHeat]]
-									heatGraphData += dataObj
-								}*/
-								 %>								
+															
 								<gui:tabView>
 								    <gui:tab label="Electricity Readings" active="true">
-								        <gvisualization:barCoreChart elementId="elecGraph" title="My Electricity Usage" width="${450}" height="${300}" columns="[['string', 'Usage'], ['number', 'Electricity (kWh)']]" data="${elecGraphData}" />
-										<div id="elecGraph"></div>
+								        kjkj
 								    </gui:tab>
 								    <gui:tab label="Heat Readings">
-								        <gvisualization:barCoreChart elementId="heatGraph" title="My Heat Usage" width="${450}" height="${300}" columns="[['string', 'Usage'], ['number', 'Electricity (kWh)']]" data="${heatGraphData}" />
-										<div id="heatGraph"></div>
+								        iuo
 								    </gui:tab>
 								    <gui:tab label="Water Readings">
-								        <gvisualization:barCoreChart elementId="waterGraph" title="My Water Usage" width="${450}" height="${300}" columns="[['string', 'Usage'], ['number', 'Cold Water (m3)'], ['number', 'Hot Water (m3)'], ['number', 'Grey Water (m3)']]" data="${waterGraphData}" />
-										<div id="waterGraph"></div>
+								        hjk
 								    </gui:tab>
 								</gui:tabView>
 								

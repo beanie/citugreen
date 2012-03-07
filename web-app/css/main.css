@@ -17,7 +17,7 @@ body {
     font: 11px verdana, arial, helvetica, sans-serif;
 }
 #grailsLogo {
-	padding:20px;
+	padding-top:10px;
 }
 
 a:link, a:visited, a:hover {
@@ -59,7 +59,7 @@ input:focus, select:focus, textarea:focus {
 
 .body {
     float: left;
-    margin: 0 15px 10px 15px;
+    margin: 0px 15px 10px 15px;
 }
 
 /* NAVIGATION MENU */
@@ -68,7 +68,6 @@ input:focus, select:focus, textarea:focus {
     background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
     border: 1px solid #ccc;
     border-style: solid none solid none;
-    margin-top: 5px;
     padding: 7px 12px;
 }
 

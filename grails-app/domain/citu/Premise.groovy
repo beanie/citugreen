@@ -12,6 +12,8 @@ class Premise {
 	int bedrooms
 	int bathrooms
 	int squareArea
+	
+	boolean occupied
 
 	ArrayList elecReadings = new ArrayList()
 	ArrayList waterReadings = new ArrayList()

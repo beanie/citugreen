@@ -153,7 +153,13 @@ class PremiseController extends BaseController {
 				}
 			} else if (utilType.equals("water")) {
 				premiseInstance.waterReadings = WaterReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), endOfDay.toDate(), [sort:"fileDate", order:"desc"])
-			} else if (utilType.equals("water")) {
+				swingData = getWaterSwingometer(premiseInstance.bedrooms, now.toDate(), endOfDay.toDate())
+				if (premiseInstance.waterReadings.size() > 0) {
+					HelperUtil.createWaterMap(premiseInstance, premise, swingData)
+				} else {
+					premise = ["error":"No Data for specified period"]
+				}
+			} else if (utilType.equals("heat")) {
 				// TODO heat stub
 			}
 		
@@ -166,8 +172,11 @@ class PremiseController extends BaseController {
 			if (viewType.equals("week")) {
 				
 				now = now.withDayOfWeek(DateTimeConstants.MONDAY)
-				swingData = getElecSwingometer(premiseInstance.bedrooms, now.toDate(), now.plusWeeks(1).minusSeconds(1).toDate())
-				
+				if (utilType.equals("elec")) {
+					swingData = getElecSwingometer(premiseInstance.bedrooms, now.toDate(), now.plusWeeks(1).minusSeconds(1).toDate())
+				} else if (utilType.equals("water")) {
+					swingData = getWaterSwingometer(premiseInstance.bedrooms, now.toDate(), now.plusWeeks(1).minusSeconds(1).toDate())
+				}				
 				7.times {
 					def endOfDay = now.plusDays(1).minusSeconds(1)
 					def elecDay = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), endOfDay.toDate(), [sort:"fileDate", order:"desc"])
@@ -180,7 +189,11 @@ class PremiseController extends BaseController {
 			} else if (viewType.equals("month")) {
 				
 				def monthDays = now.dayOfMonth().getMaximumValue()
-				swingData = getElecSwingometer(premiseInstance.bedrooms, now.toDate(), now.plusMonths(1).minusSeconds(1).toDate())
+				if (utilType.equals("elec")) {
+					swingData = getElecSwingometer(premiseInstance.bedrooms, now.toDate(), now.plusMonths(1).minusSeconds(1).toDate())
+				} else if (utilType.equals("water")) {
+					swingData = getWaterSwingometer(premiseInstance.bedrooms, now.toDate(), now.plusMonths(1).minusSeconds(1).toDate())
+				}
 				4.times {
 					def endOfWeek = now.plusDays(7).minusSeconds(1)
 					def elecWeek = ElecReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), endOfWeek.toDate(), [sort:"fileDate", order:"desc"])
@@ -201,7 +214,11 @@ class PremiseController extends BaseController {
 				}
 				
 			} else if (viewType.equals("year")) {
-				swingData = getElecSwingometer(premiseInstance.bedrooms, now.toDate(), now.plusYears(1).minusSeconds(1).toDate())
+				if (utilType.equals("elec")) {
+					swingData = getElecSwingometer(premiseInstance.bedrooms, now.toDate(), now.plusYears(1).minusSeconds(1).toDate())
+				} else if (utilType.equals("water")) {
+					swingData = getWaterSwingometer(premiseInstance.bedrooms, now.toDate(), now.plusYears(1).minusSeconds(1).toDate())
+				}
 				12.times {
 					def monthDays = now.dayOfMonth().getMaximumValue()
 					def monthEnd = now.plusDays((monthDays - now.getDayOfMonth())+1).minusSeconds(1)
@@ -223,7 +240,11 @@ class PremiseController extends BaseController {
 				}
 			} else if (utilType.equals("water")) {
 				premiseInstance.waterReadings = waterReadings
-				premise.put("water", HelperUtil.createWaterMap(premiseInstance))
+				if (premiseInstance.waterReadings.size() > 0) {
+					HelperUtil.createWaterMap(premiseInstance, premise, swingData)
+				} else {
+					premise = ["error":"No Data for specified period"]
+				}
 			} else if (utilType.equals("heat")) {
 				// TODO heat stub
 			}
@@ -258,6 +279,35 @@ class PremiseController extends BaseController {
 		return swingometer
 	}
 	
+	Map getWaterSwingometer (int noOfRooms, Date startDate, Date endDate) {
+		def premises = Premise.executeQuery("select p.flatNo from Premise p where bedrooms = "+ noOfRooms)
+		def tmpWaterFloat = 0
+		def waterReadings = new ArrayList()
+		def swingometer = [:]
+		for (i in premises) {
+			def sumWater = WaterReading.executeQuery("select sum(reading.readingValueHot), sum(reading.readingValueCold), sum(reading.readingValueGrey) from WaterReading as reading where reading.premise.flatNo = "+ i +" and reading.fileDate between:date1 AND :date2 ", [date1:startDate, date2:endDate])
+			// ignore Water for empty values
+			if (sumWater[0][1]) {
+				def tmpSum = BillUtil.calcHotWaterPriceByVolume(sumWater[0][0])+BillUtil.calcColdWaterPriceByVolume(sumWater[0][1])+BillUtil.calcGreyWaterPriceByVolume(sumWater[0][2])
+				waterReadings.add(tmpSum)
+				tmpWaterFloat = (tmpWaterFloat + tmpSum)		
+			}
+		}
+		log.info(tmpWaterFloat)
+		/*
+		if (waterReadings.size() > 0) {
+			waterReadings.sort()
+			swingometer.put("swingLow", BillUtil.calcWaterPriceByVolume(waterReadings[0]))
+			swingometer.put("swingHigh", BillUtil.calcWaterPriceByVolume(waterReadings[waterReadings]))
+			swingometer.put("peerAvg", (tmpWaterFloat / waterReadings.size()))
+		} else {
+			swingometer.put("swingLow", 0)
+			swingometer.put("swingHigh", 0)
+			swingometer.put("peerAvg", 0)
+		}*/
+		
+		return swingometer
+	}
 	Map getHighLow(int noOfRooms, Date startDate, Date endDate) {
 		def premises = Premise.executeQuery("select p.flatNo from Premise p where bedrooms = "+ noOfRooms)
 		def readings = [:]
