@@ -13,9 +13,11 @@ class ReadingController {
 	
 	def processWaterReadings = {
 		energyReadingService.processWater()
+		render("Manually processed Water Readings")
 	}
 	
 	def processHeatReadings = {
 		energyReadingService.processHeat()
+		render("Manually processed Heat Readings")
 	}
 }
