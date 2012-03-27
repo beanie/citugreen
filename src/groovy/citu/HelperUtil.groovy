@@ -26,10 +26,15 @@ class HelperUtil {
 	static Map generateElecSummary(Double sum, Map highlows, Double avg) {
 		def electricity = [:]
 		electricity.put("currentCost", BillUtil.calcElecPriceByVolume(sum))
+		println("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww")
 		electricity.put("averageCost", BillUtil.calcElecPriceByVolume(avg*24))
+		println("skdjlfklsdf")
 		electricity.put("estimateCost", BillUtil.calcElecPriceByVolume(sum+2))
+		println("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww222")
 		electricity.put("swingLow", BillUtil.calcElecPriceByVolume(highlows.elec.low))
+		println("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwe3242ww")
 		electricity.put("swingHigh", BillUtil.calcElecPriceByVolume(highlows.elec.high))
+		println("jhksdf")
 		return electricity
 	}
 	
@@ -66,7 +71,7 @@ class HelperUtil {
 	static Map createElectricityMap(Premise premiseInstance, Map premise, Map swingData) {
 		ArrayList electricityReadings = new ArrayList()
 		premiseInstance.elecReadings.each { reading ->
-			electricityReadings.add([readingValue:reading.readingValueElec, dateTime:reading.fileDate])
+			electricityReadings.add([readingValue:reading.readingValueElec, dateTime:reading.dateCreated])
 		}
 		premise.put("readings", electricityReadings)
 		premise.put("elecTotalUsage", BillUtil.calcTotal(premiseInstance.elecReadings.readingValueElec)) //done

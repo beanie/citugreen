@@ -39,9 +39,12 @@ class BillUtil {
 	}
 	
 	static Float calcElecPriceByVolume(Double reading) {
+		//println("IN HEREEEEE")
 		if (reading) {
+			println("READING "+ reading)
 			return (reading*tarrifList.elecTarrif)
 		} else {
+		println("ZERO")
 			return 0
 		}
 	}
