@@ -48,17 +48,20 @@ class EnergyReadingService {
 	
 	def processHeat() {
 		def f = new File("c:\\files\\")
+		log.warn ("I am here ")
+		
 		if( f.exists() ){
 			f.eachFile(){ file->
 				if( !file.isDirectory() )
-					if (file.name.endsWith("CSV")) {
+					if (file.name.endsWith(".csv")) {
 						log.info("Processing CSV file : "+ file.name)
-						fileRef.splitEachLine(",") {fields ->
+						file.splitEachLine(",") {fields ->
 							def premise = Premise.findByFlatNo(fields[0])
 							if (premise){
 								def tmpReading = new HeatReading(readingValueHeat:fields[1].toString(), premise:premise).save()
+								log.info ("premise found")
 							} else {
-								log.warn("Premise not found: "+ fields[0])
+								//log.warn("Premise not found: "+ fields[0])
 							}
 						}
 						file.renameTo(new File("c:\\files\\processed", file.name))

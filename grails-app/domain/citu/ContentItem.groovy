@@ -4,6 +4,7 @@ class ContentItem {
 
     String contentTitle
 	String contentBody
+	String messageType
 	
 	String image1
 	String image2

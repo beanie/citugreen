@@ -23,9 +23,11 @@
                         <tr>
                         
                             <g:sortableColumn property="id" title="${message(code: 'contentItem.id.label', default: 'Id')}" />
-                        
+                             
+                            <g:sortableColumn property="messageType" title="${message(code: 'contentItem.messageType.label', default: 'Message Type')}" />  
+                    
                             <g:sortableColumn property="contentBody" title="${message(code: 'contentItem.contentBody.label', default: 'Content Body')}" />
-                        
+                         
                             <g:sortableColumn property="contentTitle" title="${message(code: 'contentItem.contentTitle.label', default: 'Content Title')}" />
                         
                             <g:sortableColumn property="dateCreated" title="${message(code: 'contentItem.dateCreated.label', default: 'Date Created')}" />

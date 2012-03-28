@@ -28,6 +28,13 @@
                             <td valign="top" class="value">${fieldValue(bean: contentItemInstance, field: "id")}</td>
                             
                         </tr>
+                        
+                          <tr class="prop">
+                            <td valign="top" class="name"><g:message code="contentItem.messageType.label" default="MessageType" /></td>
+                            
+                            <td valign="top" class="value">${fieldValue(bean: contentItemInstance, field: "messageType")}</td>
+                            
+                        </tr>
                     
                         <tr class="prop">
                             <td valign="top" class="name"><g:message code="contentItem.contentBody.label" default="Content Body" /></td>

@@ -129,7 +129,7 @@ class ContentItemController extends BaseController {
 		def webRootDir = servletContext.getRealPath("/")
 		def contentItems = ContentItem.findAllByPublished(new Boolean("True"), [sort:"dateCreated", order:"desc"])
 		contentItems.each { ci ->
-			def map = [title:ci.contentTitle, body:ci.contentBody, createdDate:ci.dateCreated]
+			def map = [title:ci.contentTitle, body:ci.contentBody, createdDate:ci.dateCreated, messageType:ci.messageType]
 			if (ci.image1) {
 				map.put("image1", "contentImages/"+ ci.id +"/"+ ci.image1)
 			}

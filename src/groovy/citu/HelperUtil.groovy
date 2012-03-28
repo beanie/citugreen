@@ -84,25 +84,22 @@ class HelperUtil {
 		premise.put("elecPeerAvg", swingData.peerAvg/premiseInstance.elecReadings.size())
 		return premise
 	}
-
-	
-	
 	
 	static Map createWaterMap(Premise premiseInstance, Map premise, Map swingData) {
 		ArrayList waterReadings = new ArrayList()
 		premiseInstance.waterReadings.each { reading ->
-			waterReadings.add([readingValueHot:reading.readingValueHot, readingValueCold:reading.readingValueCold, readingValueGrey:reading.readingValueGrey, dateTime:reading.fileDate])
+			waterReadings.add([readingValueHot:reading.readingValueHot, readingValueCold:reading.readingValueCold, readingValueGrey:reading.readingValueGrey, dateTime:reading.dateCreated])
 		}
 		premise.put("readings", waterReadings)
-		//water.put("waterTotalUsageHot", BillUtil.calcTotal(premiseInstance.waterReadings.readingValueHot))
-		//water.put("waterTotalUsageCold", BillUtil.calcTotal(premiseInstance.waterReadings.readingValueCold))
-		//water.put("waterTotalUsageGrey", BillUtil.calcTotal(premiseInstance.waterReadings.readingValueGrey))
-		//water.put("waterTotalCostHot", BillUtil.calcTotalElecCost(premiseInstance.waterReadings.readingValueHot))
-		//water.put("waterTotalCostCold", BillUtil.calcTotalElecCost(premiseInstance.waterReadings.readingValueCold))
-		//water.put("waterTotalCostGrey", BillUtil.calcTotalElecCost(premiseInstance.waterReadings.readingValueGrey))
-		//water.put("waterAverageUsageHot", (water.waterTotalUsageHot/waterReadings.size()))
-		//water.put("waterAverageUsageCold", (water.waterTotalUsageCold/waterReadings.size()))
-		//water.put("waterAverageUsageGrey", (water.waterTotalUsageGrey/waterReadings.size()))
+		premise.put("waterTotalUsageHot", BillUtil.calcTotal(premiseInstance.waterReadings.readingValueHot))
+		premise.put("waterTotalUsageCold", BillUtil.calcTotal(premiseInstance.waterReadings.readingValueCold))
+		premise.put("waterTotalUsageGrey", BillUtil.calcTotal(premiseInstance.waterReadings.readingValueGrey))
+		premise.put("waterTotalCostHot", BillUtil.calcTotalElecCost(premiseInstance.waterReadings.readingValueHot))
+		premise.put("waterTotalCostCold", BillUtil.calcTotalElecCost(premiseInstance.waterReadings.readingValueCold))
+		premise.put("waterTotalCostGrey", BillUtil.calcTotalElecCost(premiseInstance.waterReadings.readingValueGrey))
+		//premise.put("waterAverageUsageHot", (water.waterTotalUsageHot/waterReadings.size()))
+		//premise.put("waterAverageUsageCold", (water.waterTotalUsageCold/waterReadings.size()))
+		//premise.put("waterAverageUsageGrey", (water.waterTotalUsageGrey/waterReadings.size()))
 		//water.put("waterAverageCostHot", (water.waterTotalCostHot/waterReadings.size()))
 		//water.put("waterAverageCostCold", (water.waterTotalCostCold/waterReadings.size()))
 		//water.put("waterAverageCostGrey", (water.waterTotalCostGrey/waterReadings.size()))

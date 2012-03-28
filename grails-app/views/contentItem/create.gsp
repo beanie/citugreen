@@ -37,6 +37,15 @@
                             
                             <tr class="prop">
                                 <td valign="top" class="name">
+                                    <label for="messageType"><g:message code="contentItem.messageType.label" default="Message Type" /></label>
+                                </td>
+                                <td valign="top" class="value ${hasErrors(bean: contentItemInstance, field: 'messageType', 'errors')}">
+                                    <g:textField name="messageType" value="${contentItemInstance?.messageType}" />
+                                </td>
+                            </tr>
+                            
+                            <tr class="prop">
+                                <td valign="top" class="name">
                                     <label for="contentBody"><g:message code="contentItem.contentBody.label" default="Content Body" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: contentItemInstance, field: 'contentBody', 'errors')}">
