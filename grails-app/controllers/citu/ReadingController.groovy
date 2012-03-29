@@ -6,6 +6,11 @@ class ReadingController {
 	
 	def scaffold = true
 	
+	def frig = {
+		energyReadingService.frig()
+		render("Manually h4x3d")
+	}
+	
 	def processElecReadings = {
 		energyReadingService.processElec()
 		render("Manually processed Electricity Readings")
