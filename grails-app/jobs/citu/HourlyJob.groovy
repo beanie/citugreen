@@ -9,6 +9,7 @@ class HourlyJob {
 
     def execute() {
         log.info("starting quartz job")
-		energyReadingService.frig()
+		energyReadingService.processElec()
+		energyReadingService.processWater()
     }
 }

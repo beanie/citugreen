@@ -23,50 +23,47 @@ class HelperUtil {
 		return premise
 	}
 	
+	static Double nullCheck(Double dbl) {
+		return (!dbl) ? 0 : dbl
+	}
+	
 	static Map generateElecSummary(Double sum, Map highlows, Double avg) {
 		def electricity = [:]
-
-			
-		electricity.put("currentCost", BillUtil.calcElecPriceByVolume(sum))
-	//	println("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww")
-		electricity.put("averageCost", BillUtil.calcElecPriceByVolume(avg*24))
-	//	println("skdjlfklsdf")
-		electricity.put("estimateCost", BillUtil.calcElecPriceByVolume(sum+2))
-//		println("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww222")
-		electricity.put("swingLow", BillUtil.calcElecPriceByVolume(highlows.elec.low))
-//		println("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwe3242ww")
-		electricity.put("swingHigh", BillUtil.calcElecPriceByVolume(highlows.elec.high))
-	//	println("jhksdf")
+		electricity.put("currentCost", BillUtil.calcElecPriceByVolume(nullCheck(sum)))
+		electricity.put("averageCost", BillUtil.calcElecPriceByVolume(nullCheck(avg)*24))
+		electricity.put("estimateCost", BillUtil.calcElecPriceByVolume(nullCheck(sum)+2))
+		electricity.put("swingLow", BillUtil.calcElecPriceByVolume(nullCheck(highlows?.elec?.low)))
+		electricity.put("swingHigh", BillUtil.calcElecPriceByVolume(nullCheck(highlows?.elec?.high)))
 		return electricity
 	}
 	
 	static Map generateColdWaterSummary(Double sum, Map highlows, Double avg) {
 		def coldWater = [:]
-		coldWater.put("currentCost", BillUtil.calcColdWaterPriceByVolume(sum))
-		coldWater.put("averageCost", BillUtil.calcColdWaterPriceByVolume(avg*24))
-		coldWater.put("estimateCost", BillUtil.calcColdWaterPriceByVolume(sum+1))
-		coldWater.put("swingLow", BillUtil.calcColdWaterPriceByVolume(highlows.coldWater.low))
-		coldWater.put("swingHigh", BillUtil.calcColdWaterPriceByVolume(highlows.coldWater.high))
+		coldWater.put("currentCost", BillUtil.calcColdWaterPriceByVolume(nullCheck(sum)))
+		coldWater.put("averageCost", BillUtil.calcColdWaterPriceByVolume(nullCheck(avg)*24))
+		coldWater.put("estimateCost", BillUtil.calcColdWaterPriceByVolume(nullCheck(sum)+1))
+		coldWater.put("swingLow", BillUtil.calcColdWaterPriceByVolume(nullCheck(highlows?.coldWater?.low)))
+		coldWater.put("swingHigh", BillUtil.calcColdWaterPriceByVolume(nullCheck(highlows?.coldWater?.high)))
 		return coldWater
 	}
 	
 	static Map generateHotWaterSummary(Double sum, Map highlows, Double avg) {
-		def hotWater = [:]
-		hotWater.put("currentCost", BillUtil.calcHotWaterPriceByVolume(sum))
-		hotWater.put("averageCost", BillUtil.calcHotWaterPriceByVolume(avg*24))
-		hotWater.put("estimateCost", BillUtil.calcHotWaterPriceByVolume(sum+1))
-		hotWater.put("swingLow", BillUtil.calcHotWaterPriceByVolume(highlows.hotWater.low))
-		hotWater.put("swingHigh", BillUtil.calcHotWaterPriceByVolume(highlows.hotWater.high))
+		def hotWater = [:]		
+		hotWater.put("currentCost", BillUtil.calcHotWaterPriceByVolume(nullCheck(sum)))
+		hotWater.put("averageCost", BillUtil.calcHotWaterPriceByVolume(nullCheck(avg)*24))
+		hotWater.put("estimateCost", BillUtil.calcHotWaterPriceByVolume(nullCheck(sum)+1))
+		hotWater.put("swingLow", BillUtil.calcHotWaterPriceByVolume(nullCheck(highlows?.hotWater?.low)))
+		hotWater.put("swingHigh", BillUtil.calcHotWaterPriceByVolume(nullCheck(highlows?.hotWater?.high)))
 		return hotWater
 	}
 	
 	static Map generateGreyWaterSummary(Double sum, Map highlows, Double avg) {
 		def greyWater = [:]
-		greyWater.put("currentCost", BillUtil.calcGreyWaterPriceByVolume(sum))
-		greyWater.put("averageCost", BillUtil.calcGreyWaterPriceByVolume(avg*24))
-		greyWater.put("estimateCost", BillUtil.calcGreyWaterPriceByVolume(sum+1))
-		greyWater.put("swingLow", BillUtil.calcGreyWaterPriceByVolume(highlows.greyWater.low))
-		greyWater.put("swingHigh", BillUtil.calcGreyWaterPriceByVolume(highlows.greyWater.high))
+		greyWater.put("currentCost", BillUtil.calcGreyWaterPriceByVolume(nullCheck(sum)))
+		greyWater.put("averageCost", BillUtil.calcGreyWaterPriceByVolume(nullCheck(avg)*24))
+		greyWater.put("estimateCost", BillUtil.calcGreyWaterPriceByVolume(nullCheck(sum)+1))
+		greyWater.put("swingLow", BillUtil.calcGreyWaterPriceByVolume(nullCheck(highlows?.greyWater?.low)))
+		greyWater.put("swingHigh", BillUtil.calcGreyWaterPriceByVolume(nullCheck(highlows?.greyWater?.high)))
 		return greyWater
 	}
 	
