@@ -75,17 +75,23 @@ class PremiseController extends BaseController {
 			/*
 			 * Pull back the sums for the summary
 			 */
-			def sumElec = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ premiseInstance.flatNo +" and reading.dateCreated between:date1 AND :date2 ", [date1:now.toDate(), date2:endOfDay.toDate()])
+			def sumElec = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ premiseInstance.flatNo +" and reading.fileDate between:date1 AND :date2 ", [date1:now.toDate(), date2:endOfDay.toDate()])
 			def sumWater = WaterReading.executeQuery("select sum(reading.readingValueHot), sum(reading.readingValueCold), sum(reading.readingValueGrey) from WaterReading as reading where reading.premise.flatNo = "+ premiseInstance.flatNo +" and reading.fileDate between:date1 AND :date2 ", [date1:now.toDate(), date2:endOfDay.toDate()])
 			
+		
 			/*
 			 * Pull back the avg for the summary from today minus 7 days
 			 */
-			def avgElec = ElecReading.executeQuery("select avg(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ premiseInstance.flatNo +" and reading.dateCreated between:date1 AND :date2 ", [date1:now.toDate()-7, date2:now.toDate()])
+			def avgElec = ElecReading.executeQuery("select avg(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ premiseInstance.flatNo +" and reading.fileDate between:date1 AND :date2 ", [date1:now.toDate()-7, date2:now.toDate()])
 			def avgWater = WaterReading.executeQuery("select avg(reading.readingValueHot), avg(reading.readingValueCold), avg(reading.readingValueGrey) from WaterReading as reading where reading.premise.flatNo = "+ premiseInstance.flatNo +" and reading.fileDate between:date1 AND :date2 ", [date1:now.toDate()-7, date2:now.toDate()])
 			
+			
 			def highlows = getHighLow(premiseInstance.bedrooms, now.toDate(), endOfDay.toDate())
-			log.info("Reading : "+ avgElec[0])
+			log.info("elec avg Reading : "+ avgElec[0])
+			log.info("elec Reading : "+ sumElec[0])
+			log.info("water avg Reading : "+ avgWater[0][0])
+			log.info("water Reading : "+ sumWater[0][0])
+			
 			premise.put("electricity", HelperUtil.generateElecSummary(sumElec[0], highlows, avgElec[0]))
 			premise.put("hotWater", HelperUtil.generateHotWaterSummary(sumWater[0][0], highlows, avgWater[0][0]))
 			premise.put("coldWater", HelperUtil.generateColdWaterSummary(sumWater[0][1], highlows, avgWater[0][1]))

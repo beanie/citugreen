@@ -25,16 +25,18 @@ class HelperUtil {
 	
 	static Map generateElecSummary(Double sum, Map highlows, Double avg) {
 		def electricity = [:]
+
+			
 		electricity.put("currentCost", BillUtil.calcElecPriceByVolume(sum))
-		println("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww")
+	//	println("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww")
 		electricity.put("averageCost", BillUtil.calcElecPriceByVolume(avg*24))
-		println("skdjlfklsdf")
+	//	println("skdjlfklsdf")
 		electricity.put("estimateCost", BillUtil.calcElecPriceByVolume(sum+2))
-		println("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww222")
+//		println("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww222")
 		electricity.put("swingLow", BillUtil.calcElecPriceByVolume(highlows.elec.low))
-		println("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwe3242ww")
+//		println("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwe3242ww")
 		electricity.put("swingHigh", BillUtil.calcElecPriceByVolume(highlows.elec.high))
-		println("jhksdf")
+	//	println("jhksdf")
 		return electricity
 	}
 	
