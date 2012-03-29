@@ -23,16 +23,16 @@ class EnergyReadingService {
 	
 		def random = new Random()
 	
-		ElecReading tmpReading = new ElecReading(readingValueElec:random.nextInt(8), fileDate:now, premise:p1).save()
-		ElecReading tmpReading1 = new ElecReading(readingValueElec:random.nextInt(8), fileDate:now, premise:p2).save()
-		ElecReading tmpReading2 = new ElecReading(readingValueElec:random.nextInt(8), fileDate:now, premise:p).save()
-		ElecReading tmpReading3 = new ElecReading(readingValueElec:random.nextInt(8), fileDate:now, premise:p3).save()
-		ElecReading tmpReading4 = new ElecReading(readingValueElec:random.nextInt(8), fileDate:now, premise:p4).save()
-		WaterReading tmpWater = new WaterReading(fileDate:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p1).save()
-		WaterReading tmpWater1 = new WaterReading(fileDate:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p2).save()
-		WaterReading tmpWater2 = new WaterReading(fileDate:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p3).save()
-		WaterReading tmpWater3 = new WaterReading(fileDate:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p4).save()
-		WaterReading tmpWater4 = new WaterReading(fileDate:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p).save()
+		ElecReading tmpReading = new ElecReading(readingValueElec:random.nextInt(8), dateCreated:now, premise:p1).save()
+		ElecReading tmpReading1 = new ElecReading(readingValueElec:random.nextInt(8), dateCreated:now, premise:p2).save()
+		ElecReading tmpReading2 = new ElecReading(readingValueElec:random.nextInt(8), dateCreated:now, premise:p).save()
+		ElecReading tmpReading3 = new ElecReading(readingValueElec:random.nextInt(8), dateCreated:now, premise:p3).save()
+		ElecReading tmpReading4 = new ElecReading(readingValueElec:random.nextInt(8), dateCreated:now, premise:p4).save()
+		WaterReading tmpWater = new WaterReading(dateCreated:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p1).save()
+		WaterReading tmpWater1 = new WaterReading(dateCreated:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p2).save()
+		WaterReading tmpWater2 = new WaterReading(dateCreated:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p3).save()
+		WaterReading tmpWater3 = new WaterReading(dateCreated:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p4).save()
+		WaterReading tmpWater4 = new WaterReading(dateCreated:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p).save()
 
 	}
 	
