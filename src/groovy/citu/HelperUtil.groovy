@@ -12,6 +12,8 @@ class HelperUtil {
 		} else if (params.macAddress) {
 			def stbInstance = SetTopBox.findByMacAddress(params.macAddress)
 			premiseInstance = stbInstance.premise
+			
+			
 		} else {
 			return premiseInstance
 		}

@@ -26,9 +26,12 @@ environments {
         }
     }
     production {
-        dataSource {
-            dbCreate = "create-drop"
-            url = "jdbc:hsqldb:mem:liveDb"
-        }
+		dataSource {
+            dbCreate = "update"
+            driverClassName = "com.mysql.jdbc.Driver"
+            url = "jdbc:mysql://localhost/citu"
+            username = "root"
+            password = "v1rg1nd3m0"
+		}
     }
 }

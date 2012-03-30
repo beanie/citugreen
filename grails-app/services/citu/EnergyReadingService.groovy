@@ -117,7 +117,7 @@ class EnergyReadingService {
 									def tmpReading = new WaterReading(fileDate:tmpFileDate, readingValueCold:reading.item[0].valuelong.toString(), readingValueHot:reading.item[1].valuelong.toString(), readingValueGrey:reading.item[2].valuelong.toString(), premise:premise).save()
 								}
 							} else {
-								log.warn("Premise not found: "+ reading.name.toString())
+							//	log.warn("Premise not found: "+ reading.name.toString())
 							}
 						}
 						log.info("Processed XML file : "+ urlEntry.urlPath)

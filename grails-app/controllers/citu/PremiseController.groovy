@@ -45,6 +45,8 @@ class PremiseController extends BaseController {
 	def getReadingsByDate = {
 
 		def Premise premiseInstance = HelperUtil.getPremise(params)
+		
+		log.info ("Requesting premise "+premiseInstance)
 
 		if (!premiseInstance) {
 			render("invalid premise ID")

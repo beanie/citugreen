@@ -42,6 +42,8 @@
                         
                             <td><g:link action="show" id="${contentItemInstance.id}">${fieldValue(bean: contentItemInstance, field: "id")}</g:link></td>
                         
+							<td>${fieldValue(bean: contentItemInstance, field: "messageType")}</td>                        
+                            
                             <td>${fieldValue(bean: contentItemInstance, field: "contentBody")}</td>
                         
                             <td>${fieldValue(bean: contentItemInstance, field: "contentTitle")}</td>
