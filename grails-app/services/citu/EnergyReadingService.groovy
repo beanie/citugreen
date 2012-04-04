@@ -61,7 +61,7 @@ class EnergyReadingService {
 								def tmpReading = new HeatReading(readingValueHeat:fields[1].toString(), premise:premise).save()
 								log.info ("premise found")
 							} else {
-								//log.warn("Premise not found: "+ fields[0])
+								log.warn("Premise not found: "+ fields[0])
 							}
 						}
 						file.renameTo(new File("c:\\files\\processed", file.name))
@@ -102,22 +102,32 @@ class EnergyReadingService {
 						
 						readings.element.each { reading ->
 							def premise = Premise.findByFlatNo(reading.name.toString())
+							//println ("premise "+premise)
+							
 							if (premise){
 								if (urlEntry.category.equals("Electricity")) {
 									ArrayList tmp = ElecReading.findAllByPremise(premise)
 									def last
 									if (tmp) {
-										last = tmp.first().readingValueElec
+										last = tmp.last().realReadingElec	
 									} else {
 										last = 0
 									}
-									def realValue = (reading.item.rawvalue.toInteger() - last)
-									def tmpReading = new ElecReading(readingValueElec:realValue, fileDate:tmpFileDate, premise:premise).save()
+									def realValue = (reading.item.rawvalue.toInteger()- last)
+									def readingValue = reading.item.rawvalue.toInteger()
+															
+									
+						//			println ("real value"+realValue.toString())
+						//			println ("last reading"+last.toString())
+						//			println ("Real reading"+readingValue.toString())
+									
+									def tmpReading = new ElecReading(readingValueElec:realValue, realReadingElec:readingValue, fileDate:tmpFileDate, premise:premise).save()
+																	
 								} else if (urlEntry.category.equals("Water")) {
 									def tmpReading = new WaterReading(fileDate:tmpFileDate, readingValueCold:reading.item[0].valuelong.toString(), readingValueHot:reading.item[1].valuelong.toString(), readingValueGrey:reading.item[2].valuelong.toString(), premise:premise).save()
 								}
 							} else {
-							//	log.warn("Premise not found: "+ reading.name.toString())
+								log.warn("Premise not found: "+ reading.name.toString())
 							}
 						}
 						log.info("Processed XML file : "+ urlEntry.urlPath)
