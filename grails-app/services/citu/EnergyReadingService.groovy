@@ -113,6 +113,9 @@ class EnergyReadingService {
 									} else {
 										last = 0
 									}
+									
+									// realValue is the difference in Value, readingValue is the raw value
+									
 									def realValue = (reading.item.rawvalue.toInteger()- last)
 									def readingValue = reading.item.rawvalue.toInteger()
 															

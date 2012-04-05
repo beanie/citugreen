@@ -90,10 +90,28 @@
                 <ul>
                  
                     <g:each var="c" in="${grailsApplication.controllerClasses.sort { it.fullName } }">
-                        <li class="controller"><g:link controller="${c.logicalPropertyName}">${c.fullName}</g:link></li>
+                    
+                     <li class="controller"><g:link controller="${c.logicalPropertyName}">${c.fullName}</g:link></li>
+                            
                     </g:each>
-
-                </ul>
+                    
+                    </ul>
+                    </P>
+                    
+                    <table border="1">
+					<tr>
+                                       
+                  		<td><a href="./premise/list"><img src="images/house.jpg"></a> </td>
+                  		<td> <a href="./user/list"><img src="images/people.jpg"></a> </td>
+                  		<td> <a href="./setTopBox/list"><img src="images/tivo.jpg"></a> </td>
+                  	</tr>
+                  	<tr>
+						<td><a href="./contentItem/list"><img src="images/content.jpg"></a> </td>
+						<td> <a href="./energyFileRef/list"><img src="images/energy.jpg"></a> </td>
+					</tr>
+						
+						</table> 
+						
             </div>
         </div>
     </body>

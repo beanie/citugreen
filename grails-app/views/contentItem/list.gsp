@@ -1,4 +1,3 @@
-
 <%@ page import="citu.ContentItem" %>
 <html>
     <head>
