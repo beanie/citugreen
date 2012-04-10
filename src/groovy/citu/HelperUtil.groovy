@@ -39,6 +39,8 @@ class HelperUtil {
 		return electricity
 	}
 	
+	// TODO check why this is times 24
+	
 	static Map generateColdWaterSummary(Double sum, Map highlows, Double avg) {
 		def coldWater = [:]
 		coldWater.put("currentCost", BillUtil.calcColdWaterPriceByVolume(nullCheck(sum)))

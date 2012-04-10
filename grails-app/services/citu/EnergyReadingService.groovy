@@ -117,18 +117,49 @@ class EnergyReadingService {
 									// realValue is the difference in Value, readingValue is the raw value
 									
 									def realValue = (reading.item.rawvalue.toInteger()- last)
-									def readingValue = reading.item.rawvalue.toInteger()
-															
-									
-						//			println ("real value"+realValue.toString())
-						//			println ("last reading"+last.toString())
-						//			println ("Real reading"+readingValue.toString())
-									
+									def readingValue = reading.item.rawvalue.toInteger()		
+												
 									def tmpReading = new ElecReading(readingValueElec:realValue, realReadingElec:readingValue, fileDate:tmpFileDate, premise:premise).save()
 																	
 								} else if (urlEntry.category.equals("Water")) {
-									def tmpReading = new WaterReading(fileDate:tmpFileDate, readingValueCold:reading.item[0].valuelong.toString(), readingValueHot:reading.item[1].valuelong.toString(), readingValueGrey:reading.item[2].valuelong.toString(), premise:premise).save()
-								}
+								
+									ArrayList tmp = WaterReading.findAllByPremise(premise)
+									
+									def lastCold = 0
+									def lastGrey = 0
+									def lastHot = 0
+									
+									if (tmp) {
+										lastCold = tmp.last().realValueCold
+										lastHot = tmp.last().realValueHot
+										lastGrey = tmp.last().realValueGrey
+										
+									} //else {
+									//	lastCold = 0
+									//	lastGrey = 0
+									//	lastHot = 0
+								//	}
+									
+									// realValue is the difference in Value, readingValue is the raw value
+									
+									def diffValueCold = (reading.item[0].rawvalue.toInteger()- lastCold)
+									def rawValueCold = reading.item[0].rawvalue.toInteger()
+									def diffValueHot = (reading.item[1].rawvalue.toInteger()- lastHot)
+									def rawValueHot = reading.item[1].rawvalue.toInteger()
+									def diffValueGrey = (reading.item[2].rawvalue.toInteger()- lastGrey)
+									def rawValueGrey = reading.item[2].rawvalue.toInteger()
+									
+									println ("Diff Value Cold"+diffValueCold.toString())
+									println ("Raw Value Cold "+rawValueCold.toString())
+									println ("Last Value Cold "+lastCold.toString())
+									println ("Diff Value Hot "+diffValueHot.toString())
+									println ("Raw Value Hot "+rawValueHot.toString())
+									println ("Diff Value Grey "+diffValueGrey.toString())
+									println ("Raw Value Grey "+rawValueGrey.toString())
+									
+									def tmpReading = new WaterReading(fileDate:tmpFileDate, readingValueCold:diffValueCold, realValueCold:rawValueCold, readingValueHot:diffValueHot, realValueHot:rawValueHot, readingValueGrey:diffValueGrey, realValueGrey:rawValueGrey, premise:premise).save()
+									
+									}
 							} else {
 								log.warn("Premise not found: "+ reading.name.toString())
 							}
