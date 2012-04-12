@@ -57,35 +57,35 @@ class EnergyReadingService {
 						log.info("Processing CSV file : "+ file.name)
 						file.splitEachLine(",") {fields ->
 							
-							def df = fields[0].toString()
-							def tg = df.replace(/"/, '')
+					//		def df = fields[0].toString()
+					//		def tg = df.replace(/"/, '')
 					
-							def premise = Premise.findByFlatNo()
+							def premise = Premise.findByFlatNo(fields[0])
 							if (premise){
 								
 							//	def tmpReading = new HeatReading(readingValueHeat:fields[1].toString(), premise:premise).save()
 			
-								ArrayList tmp = HeatReading.findAllByPremise(premise)
-								def last
-								if (tmp) {
-									last = tmp.last().realReadingHeat
-								} else {
-									last = 0
-								}
+						//		ArrayList tmp = HeatReading.findAllByPremise(premise)
+						//		def last
+						//		if (tmp) {
+						//			last = tmp.last().realReadingHeat
+						//		} else {
+						//			last = 0
+						//		}
 								
 								// realValue is the difference in Value, readingValue is the raw value
 								
-								def realValue = (fields[1].toInteger()- last)
-								def readingValue = fields[1].toInteger()
+						//		def realValue = (fields[1].toInteger()- last)
+						//		def readingValue = fields[1].toInteger()
 								
-								println file.name
-								println realValue.toString()
-								println readingValue.toString()
+						//		println file.name
+						//		println realValue.toString()
+						//		println readingValue.toString()
 								
+								def tmpReading = new HeatReading(readingValueHeat:fields[1].toString(), premise:premise).save()
 											
-								def tmpReading = new HeatReading(readingValueElec:realValue, realReadingElec:readingValue, fileDate:file.name, premise:premise).save()
-								
-								
+						//		def tmpReading = new HeatReading(readingValueElec:realValue, realReadingElec:readingValue, fileDate:file.name, premise:premise).save()
+											
 								log.info ("premise found")
 							} else {
 								log.warn("Premise not found: "+ fields[0])
@@ -172,13 +172,7 @@ class EnergyReadingService {
 									def diffValueGrey = ((reading.item[2].rawvalue.toInteger())*10- lastGrey)
 									def rawValueGrey = (reading.item[2].rawvalue.toInteger())*10
 									
-									println ("Diff Value Cold"+diffValueCold.toString())
-								//	println ("Raw Value Cold "+rawValueCold.toString())
-							//		println ("Last Value Cold "+lastCold.toString())
-									println ("Diff Value Hot "+diffValueHot.toString())
-							//		println ("Raw Value Hot "+rawValueHot.toString())
-									println ("Diff Value Grey "+diffValueGrey.toString())
-							//		println ("Raw Value Grey "+rawValueGrey.toString())
+						
 									
 									def tmpReading = new WaterReading(fileDate:tmpFileDate, readingValueCold:diffValueCold, realValueCold:rawValueCold, readingValueHot:diffValueHot, realValueHot:rawValueHot, readingValueGrey:diffValueGrey, realValueGrey:rawValueGrey, premise:premise).save()
 									
