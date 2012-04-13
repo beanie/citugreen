@@ -39,8 +39,6 @@ class HelperUtil {
 		return electricity
 	}
 	
-	// TODO check why this is times 24
-	
 	static Map generateHeatSummary(Double sum, Map highlows, Double avg) {
 		def heat = [:]
 		heat.put("currentCost", BillUtil.calcHeatPriceByVolume(nullCheck(sum)))
@@ -128,13 +126,12 @@ class HelperUtil {
 		premise.put("waterTotalCostHot", BillUtil.calcTotalHotWaterCost(premiseInstance.waterReadings.readingValueHot))
 		premise.put("waterTotalCostCold", BillUtil.calcTotalColdWaterCost(premiseInstance.waterReadings.readingValueCold))
 		premise.put("waterTotalCostGrey", BillUtil.calcTotalGreyWaterCost(premiseInstance.waterReadings.readingValueGrey))
-		//premise.put("waterAverageUsageHot", (water.waterTotalUsageHot/waterReadings.size()))
-		//premise.put("waterAverageUsageCold", (water.waterTotalUsageCold/waterReadings.size()))
-		//premise.put("waterAverageUsageGrey", (water.waterTotalUsageGrey/waterReadings.size()))
-		//water.put("waterAverageCostHot", (water.waterTotalCostHot/waterReadings.size()))
-		//water.put("waterAverageCostCold", (water.waterTotalCostCold/waterReadings.size()))
-		//water.put("waterAverageCostGrey", (water.waterTotalCostGrey/waterReadings.size()))
-		//water.put("waterCombinedTotalCost", (water.waterTotalCostHot + water.waterTotalCostCold + water.waterTotalCostGrey))
+		premise.put("waterAverageUsageHot", BillUtil.calcHotWaterPriceByVolume((premise.hotWaterTotalUsage/premiseInstance.waterReadings.size())*premiseInstance.waterReadings.size()))
+		premise.put("waterAverageUsageCold", BillUtil.calcColdWaterPriceByVolume((premise.coldWaterTotalUsage/premiseInstance.waterReadings.size())*premiseInstance.waterReadings.size()))
+		premise.put("waterAverageUsageGrey", BillUtil.calcGreyWaterPriceByVolume((premise.greyWaterTotalUsage/premiseInstance.waterReadings.size())*premiseInstance.waterReadings.size()))
+		premise.put("waterAvgUsage", premise.waterTotalUsage/premiseInstance.waterReadings.size()) //done
+		premise.put("waterPeerAvg", swingData.peerAvg/premiseInstance.waterReadings.size())
+
 		return premise
 	}
 	

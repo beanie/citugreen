@@ -324,7 +324,7 @@ class PremiseController extends BaseController {
 			def sumHeat = HeatReading.executeQuery("select sum(reading.readingValueHeat) from HeatReading as reading where reading.premise.flatNo = "+ i +" and reading.fileDate between:date1 AND :date2 ", [date1:startDate, date2:endDate])
 			// ignore Elec for empty values
 			if (sumHeat[0]) {
-				tmpHeatFloat = (tmpElecFloat + sumHeat[0])
+				tmpHeatFloat = (tmpHeatFloat + sumHeat[0])
 				heatReadings.add(sumHeat[0])
 			}
 		}
@@ -348,16 +348,30 @@ class PremiseController extends BaseController {
 		def waterReadings = new ArrayList()
 		def swingometer = [:]
 		for (i in premises) {
-			def sumWater = WaterReading.executeQuery("select sum(reading.readingValueHot), sum(reading.readingValueCold), sum(reading.readingValueGrey) from WaterReading as reading where reading.premise.flatNo = "+ i +" and reading.fileDate between:date1 AND :date2 ", [date1:startDate, date2:endDate])
+			def sumHotWater = WaterReading.executeQuery("select sum(reading.readingValueHot) from WaterReading as reading where reading.premise.flatNo = "+ i +" and reading.fileDate between:date1 AND :date2 ", [date1:startDate, date2:endDate])
+			def sumColdWater = WaterReading.executeQuery("select sum(reading.readingValueCold) from WaterReading as reading where reading.premise.flatNo = "+ i +" and reading.fileDate between:date1 AND :date2 ", [date1:startDate, date2:endDate])
+			def sumGreyWater = WaterReading.executeQuery("select sum(reading.readingValueGrey) from WaterReading as reading where reading.premise.flatNo = "+ i +" and reading.fileDate between:date1 AND :date2 ", [date1:startDate, date2:endDate])
+			
 			// ignore Water for empty values
-			if (sumWater[0][1]) {
-				def tmpSum = BillUtil.calcHotWaterPriceByVolume(sumWater[0][0])+BillUtil.calcColdWaterPriceByVolume(sumWater[0][1])+BillUtil.calcGreyWaterPriceByVolume(sumWater[0][2])
-				waterReadings.add(tmpSum)
+			
+			if (sumHotWater[0]) {
+				tmpHotWaterFloat = (tmpHotWaterFloat + sumHotWater[0])
+				heatReadings.add(sumHeat[0])
+			}
+			
+			
+			if (sumHotWater[0][1]) {
+				def tmpHotSum = BillUtil.calcHotWaterPriceByVolume(sumWater[0][0])
+				def tmpColdSum = BillUtil.calcColdWaterPriceByVolume(sumWater[0][1])
+				def tmpGreySum = BillUtil.calcGreyWaterPriceByVolume(sumWater[0][2])
+				hotWaterReadings.add(tmpHotSum)
+				
+				
 				tmpWaterFloat = (tmpWaterFloat + tmpSum)		
 			}
 		}
 		log.info(tmpWaterFloat)
-		/*
+		
 		if (waterReadings.size() > 0) {
 			waterReadings.sort()
 			swingometer.put("swingLow", BillUtil.calcWaterPriceByVolume(waterReadings[0]))
@@ -367,7 +381,7 @@ class PremiseController extends BaseController {
 			swingometer.put("swingLow", 0)
 			swingometer.put("swingHigh", 0)
 			swingometer.put("peerAvg", 0)
-		}*/
+		}
 		
 		return swingometer
 	}
