@@ -55,40 +55,53 @@ class EnergyReadingService {
 				if( !file.isDirectory() )
 					if (file.name.endsWith(".csv")) {
 						log.info("Processing CSV file : "+ file.name)
+						
+						SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd")
+						def tmpFileDate = df.parse(file.name.toString())
+						
+						println ("File Date "+ tmpFileDate)
+						
 						file.splitEachLine(",") {fields ->
 							
-					//		def df = fields[0].toString()
-					//		def tg = df.replace(/"/, '')
-					
-							def premise = Premise.findByFlatNo(fields[0])
+							def tmpflatID = fields[0].toString()
+							def flatID = tmpflatID.replace(/"/, '')
+
+							def premise = Premise.findByFlatNo(flatID)
 							if (premise){
 								
 							//	def tmpReading = new HeatReading(readingValueHeat:fields[1].toString(), premise:premise).save()
 			
-						//		ArrayList tmp = HeatReading.findAllByPremise(premise)
-						//		def last
-						//		if (tmp) {
-						//			last = tmp.last().realReadingHeat
-						//		} else {
-						//			last = 0
-						//		}
+								ArrayList tmp = HeatReading.findAllByPremise(premise)
+								def last
+								if (tmp) {
+									last = tmp.last().realReadingHeat
+							} else {
+									last = 0
+								}
 								
 								// realValue is the difference in Value, readingValue is the raw value
+							
+							def tmpHeatReading = fields[1]
+							def heatReading = tmpHeatReading.replace(/"/, '')
+
+							println heatReading
 								
-						//		def realValue = (fields[1].toInteger()- last)
-						//		def readingValue = fields[1].toInteger()
+								def realValue = (heatReading - last)
+								def readingValue = heatReading
 								
-						//		println file.name
-						//		println realValue.toString()
-						//		println readingValue.toString()
+								println ("flat "+ flatID)
+								println ("Reading "+ readingValue)
+								println ("real " +realValue)
+								println ("last " +last)
 								
-								def tmpReading = new HeatReading(readingValueHeat:fields[1].toString(), premise:premise).save()
+								
+							//	def tmpReading = new HeatReading(readingValueHeat:fields[1].toString(), premise:premise).save()
 											
-						//		def tmpReading = new HeatReading(readingValueElec:realValue, realReadingElec:readingValue, fileDate:file.name, premise:premise).save()
+								def tmpReading = new HeatReading(readingValueElec:realValue, realReadingElec:readingValue, fileDate:tmpFileDate, premise:premise).save()
 											
-								log.info ("premise found")
+							//	log.info ("premise found")
 							} else {
-								log.warn("Premise not found: "+ fields[0])
+							//	log.warn("Premise not found: "+ fields[0])
 							}
 						}
 						file.renameTo(new File("c:\\files\\processed", file.name))

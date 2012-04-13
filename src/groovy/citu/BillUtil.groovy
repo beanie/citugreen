@@ -59,5 +59,8 @@ class BillUtil {
 	static Float calcGreyWaterPriceByVolume(Double reading) {
 		return (reading*tarrifList.greyWaterTarrif)
 	}
+	static Float calcHeatPriceByVolume(Double reading) {
+		return (reading*tarrifList.heatTarrif)
+	}
 
 }

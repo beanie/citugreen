@@ -41,6 +41,17 @@ class HelperUtil {
 	
 	// TODO check why this is times 24
 	
+	static Map generateHeatSummary(Double sum, Map highlows, Double avg) {
+		def heat = [:]
+		heat.put("currentCost", BillUtil.calcHeatPriceByVolume(nullCheck(sum)))
+		heat.put("averageCost", BillUtil.calcHeatPriceByVolume(nullCheck(avg)*24))
+		heat.put("estimateCost", BillUtil.calcHeatPriceByVolume(nullCheck(sum)+2))
+		heat.put("swingLow", BillUtil.calcHeatPriceByVolume(nullCheck(highlows?.elec?.low)))
+		heat.put("swingHigh", BillUtil.calcHeatPriceByVolume(nullCheck(highlows?.elec?.high)))
+		return heat
+	}
+
+	
 	static Map generateColdWaterSummary(Double sum, Map highlows, Double avg) {
 		def coldWater = [:]
 		coldWater.put("currentCost", BillUtil.calcColdWaterPriceByVolume(nullCheck(sum)))
@@ -88,6 +99,23 @@ class HelperUtil {
 		return premise
 	}
 	
+	static Map createHeatMap(Premise premiseInstance, Map premise, Map swingData) {
+		ArrayList heatReadings = new ArrayList()
+		premiseInstance.elecReadings.each { reading ->
+			heatReadings.add([readingValue:reading.readingValueheat, dateTime:reading.dateCreated])
+		}
+		premise.put("readings", heatReadings)
+		premise.put("heatTotalUsage", BillUtil.calcTotal(premiseInstance.heatReadings.readingValueHeat)) //done
+		premise.put("heatTotalCost", BillUtil.calcTotalHeatCost(premiseInstance.heatReadings.readingValueHeat)) //done
+		premise.put("heatAverageCost", BillUtil.calcHeatPriceByVolume((premise.heatTotalUsage/premiseInstance.heatReadings.size())*premiseInstance.heatReadings.size()))
+		premise.put("heatSwingLow", swingData.swingLow) //done
+		premise.put("heatSwingHigh", swingData.swingHigh) //done
+		premise.put("heaEstimatedCost", "TODO")
+		premise.put("heatAvgUsage", premise.heatTotalUsage/premiseInstance.heatReadings.size()) //done
+		premise.put("heatPeerAvg", swingData.peerAvg/premiseInstance.heatReadings.size())
+		return premise
+	}
+	
 	static Map createWaterMap(Premise premiseInstance, Map premise, Map swingData) {
 		ArrayList waterReadings = new ArrayList()
 		premiseInstance.waterReadings.each { reading ->
@@ -110,18 +138,4 @@ class HelperUtil {
 		return premise
 	}
 	
-	static Map createHeatMap(Premise premiseInstance) {
-		ArrayList heatReadings = new ArrayList()
-		premiseInstance.heatReadings.each { reading ->
-			heatReadings.add([readingValue:reading.readingValueHeat, dateTime:reading.dateCreated])
-		}
-		def heat = [:]
-		heat.put("heatReadings", heatReadings)
-		heat.put("heatTotalUsage", BillUtil.calcTotal(premiseInstance.heatReadings.readingValueHeat))
-		heat.put("heatTotalCost", BillUtil.calcTotalHeatCost(premiseInstance.heatReadings.readingValueHeat))
-		heat.put("heatAverageUsage", heat.heatTotalUsage/heatReadings.size())
-		heat.put("heatAverageCost", heat.heatTotalCost/heatReadings.size())
-		return heat
-	}
-
 }
