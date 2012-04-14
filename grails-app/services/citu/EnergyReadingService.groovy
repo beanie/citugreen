@@ -58,9 +58,8 @@ class EnergyReadingService {
 						
 						SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd")
 						def tmpFileDate = df.parse(file.name.toString())
-						
-						println ("File Date "+ tmpFileDate)
-						
+
+											
 						file.splitEachLine(",") {fields ->
 							
 							def tmpflatID = fields[0].toString()
@@ -68,37 +67,16 @@ class EnergyReadingService {
 
 							def premise = Premise.findByFlatNo(flatID)
 							if (premise){
-								
-							//	def tmpReading = new HeatReading(readingValueHeat:fields[1].toString(), premise:premise).save()
-			
-								ArrayList tmp = HeatReading.findAllByPremise(premise)
-								def last
-								if (tmp) {
-									last = tmp.last().realReadingHeat
-							} else {
-									last = 0
-								}
-								
-								// realValue is the difference in Value, readingValue is the raw value
 							
 							def tmpHeatReading = fields[1]
-							def heatReading = tmpHeatReading.replace(/"/, '')
-
+							def heatReading = tmpHeatReading.replaceAll('"', '').toFloat()
+							
+							println premise
 							println heatReading
-								
-								def realValue = (heatReading - last)
-								def readingValue = heatReading
-								
-								println ("flat "+ flatID)
-								println ("Reading "+ readingValue)
-								println ("real " +realValue)
-								println ("last " +last)
-								
-								
-							//	def tmpReading = new HeatReading(readingValueHeat:fields[1].toString(), premise:premise).save()
-											
-								def tmpReading = new HeatReading(readingValueElec:realValue, realReadingElec:readingValue, fileDate:tmpFileDate, premise:premise).save()
-											
+							println tmpFileDate
+
+							def tmpReading = new HeatReading(readingValueHeat:heatReading, fileDate:tmpFileDate, premise:premise).save()	
+												
 							//	log.info ("premise found")
 							} else {
 							//	log.warn("Premise not found: "+ fields[0])
@@ -140,6 +118,7 @@ class EnergyReadingService {
 						SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd")
 						def tmpFileDate = df.parse(fileInfo.creationdate.toString())
 						
+						
 						readings.element.each { reading ->
 							def premise = Premise.findByFlatNo(reading.name.toString())
 							//println ("premise "+premise)
@@ -158,7 +137,8 @@ class EnergyReadingService {
 									
 									def realValue = (reading.item.rawvalue.toInteger()- last)
 									def readingValue = reading.item.rawvalue.toInteger()		
-												
+										
+											
 									def tmpReading = new ElecReading(readingValueElec:realValue, realReadingElec:readingValue, fileDate:tmpFileDate, premise:premise).save()
 																	
 								} else if (urlEntry.category.equals("Water")) {

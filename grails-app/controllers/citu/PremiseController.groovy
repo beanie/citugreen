@@ -31,16 +31,6 @@ class PremiseController extends BaseController {
 		}
 	}
 
-	def summary5 = {
-
-		def Premise premiseInstance = HelperUtil.getPremise(params)
-
-		if (!premiseInstance) {
-			render("invalid premise ID")
-		} else {
-			[simpleView: simpleViewMap(params)]
-		}
-	}
 
 	def getReadingsByDate = {
 
@@ -87,7 +77,7 @@ class PremiseController extends BaseController {
 			 */
 			def avgElec = ElecReading.executeQuery("select avg(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ premiseInstance.flatNo +" and reading.dateCreated between:date1 AND :date2 ", [date1:now.toDate()-7, date2:now.toDate()])
 			def avgWater = WaterReading.executeQuery("select avg(reading.readingValueHot), avg(reading.readingValueCold), avg(reading.readingValueGrey) from WaterReading as reading where reading.premise.flatNo = "+ premiseInstance.flatNo +" and reading.dateCreated between:date1 AND :date2 ", [date1:now.toDate()-7, date2:now.toDate()])
-			def avgHeat = ElecReading.executeQuery("select avg(reading.readingValueHeat) from HeatReading as reading where reading.premise.flatNo = "+ premiseInstance.flatNo +" and reading.dateCreated between:date1 AND :date2 ", [date1:now.toDate()-7, date2:now.toDate()])
+			def avgHeat = HeatReading.executeQuery("select avg(reading.readingValueHeat) from HeatReading as reading where reading.premise.flatNo = "+ premiseInstance.flatNo +" and reading.dateCreated between:date1 AND :date2 ", [date1:now.toDate()-7, date2:now.toDate()])
 			
 			
 			def highlows = getHighLow(premiseInstance.bedrooms, now.toDate(), endOfDay.toDate())
