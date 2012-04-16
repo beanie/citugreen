@@ -48,6 +48,10 @@ class BillUtil {
 		}
 	}
 	
+	
+	static Float calcWaterPriceByVolume(Double reading) {
+		return (reading*tarrifList.hotWaterTarrif)
+	}
 	static Float calcHotWaterPriceByVolume(Double reading) {
 		return (reading*tarrifList.hotWaterTarrif)
 	}

@@ -307,12 +307,12 @@ class PremiseController extends BaseController {
 	
 	Map getHeatSwingometer (int noOfRooms, Date startDate, Date endDate) {
 		def premises = Premise.executeQuery("select p.flatNo from Premise p where bedrooms = "+ noOfRooms)
-		def tmpElecFloat = 0
+		def tmpHeatFloat = 0
 		def heatReadings = new ArrayList()
 		def swingometer = [:]
 		for (i in premises) {
 			def sumHeat = HeatReading.executeQuery("select sum(reading.readingValueHeat) from HeatReading as reading where reading.premise.flatNo = "+ i +" and reading.fileDate between:date1 AND :date2 ", [date1:startDate, date2:endDate])
-			// ignore Elec for empty values
+			// ignore Heat for empty values
 			if (sumHeat[0]) {
 				tmpHeatFloat = (tmpHeatFloat + sumHeat[0])
 				heatReadings.add(sumHeat[0])
@@ -332,31 +332,17 @@ class PremiseController extends BaseController {
 		return swingometer
 	}
 	
-	Map getWaterSwingometer (int noOfRooms, Date startDate, Date endDate) {
+		Map getWaterSwingometer (int noOfRooms, Date startDate, Date endDate) {
 		def premises = Premise.executeQuery("select p.flatNo from Premise p where bedrooms = "+ noOfRooms)
 		def tmpWaterFloat = 0
 		def waterReadings = new ArrayList()
 		def swingometer = [:]
 		for (i in premises) {
-			def sumHotWater = WaterReading.executeQuery("select sum(reading.readingValueHot) from WaterReading as reading where reading.premise.flatNo = "+ i +" and reading.fileDate between:date1 AND :date2 ", [date1:startDate, date2:endDate])
-			def sumColdWater = WaterReading.executeQuery("select sum(reading.readingValueCold) from WaterReading as reading where reading.premise.flatNo = "+ i +" and reading.fileDate between:date1 AND :date2 ", [date1:startDate, date2:endDate])
-			def sumGreyWater = WaterReading.executeQuery("select sum(reading.readingValueGrey) from WaterReading as reading where reading.premise.flatNo = "+ i +" and reading.fileDate between:date1 AND :date2 ", [date1:startDate, date2:endDate])
-			
+			def sumWater = WaterReading.executeQuery("select sum(reading.readingValueHot), sum(reading.readingValueCold), sum(reading.readingValueGrey) from WaterReading as reading where reading.premise.flatNo = "+ i +" and reading.fileDate between:date1 AND :date2 ", [date1:startDate, date2:endDate])
 			// ignore Water for empty values
-			
-			if (sumHotWater[0]) {
-				tmpHotWaterFloat = (tmpHotWaterFloat + sumHotWater[0])
-				heatReadings.add(sumHeat[0])
-			}
-			
-			
-			if (sumHotWater[0][1]) {
-				def tmpHotSum = BillUtil.calcHotWaterPriceByVolume(sumWater[0][0])
-				def tmpColdSum = BillUtil.calcColdWaterPriceByVolume(sumWater[0][1])
-				def tmpGreySum = BillUtil.calcGreyWaterPriceByVolume(sumWater[0][2])
-				hotWaterReadings.add(tmpHotSum)
-				
-				
+			if (sumWater[0][1]) {
+				def tmpSum = BillUtil.calcHotWaterPriceByVolume(sumWater[0][0])+BillUtil.calcColdWaterPriceByVolume(sumWater[0][1])+BillUtil.calcGreyWaterPriceByVolume(sumWater[0][2])
+				waterReadings.add(tmpSum)
 				tmpWaterFloat = (tmpWaterFloat + tmpSum)		
 			}
 		}
