@@ -46,7 +46,7 @@ class PremiseController extends BaseController {
 	}
 	
 	/*
-	 * Get the reading summary view for the landing page
+	 * Get the reading summary view for the landing page (test commit)
 	 */
 	def getReadingsSummary = {
 		
