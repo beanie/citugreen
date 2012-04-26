@@ -46,6 +46,48 @@ class EnergyReadingService {
 		processXml(waterUrls)
 	}
 	
+	
+	def processHeatPhil() {
+		def f = new File("c:\\files\\")
+		log.info ("Processing Heat ")
+		
+		if( f.exists() ){
+			f.eachFile(){ file->
+				if( !file.isDirectory() )
+					if (file.name.endsWith(".csv")) {
+						log.info("Processing CSV file : "+ file.name)
+						
+						SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd")
+						def tmpFileDate = df.parse(file.name.toString())
+				
+						file.splitEachLine(",") {fields ->
+							
+							def tmpflatID = fields[0].toString()
+							def flatID = tmpflatID.replace(/"/, '')
+
+							def premise = Premise.findByFlatNo(flatID)
+							if (premise){
+							
+							def tmpHeatReading = fields[1]
+							def heatReading = tmpHeatReading.replaceAll('"', '').toFloat()
+							
+
+							def tmpReading = new HeatReading(readingValueHeat:heatReading, fileDate:tmpFileDate,  premise:premise).save()
+												
+							//	log.info ("premise found")
+							} else {
+							//	log.warn("Premise not found: "+ fields[0])
+							}
+						}
+						file.renameTo(new File("c:\\files\\processed", file.name))
+						log.info("Processed CSV file : "+ file.name)
+					}
+			}
+		}
+	}
+	
+	
+	
 	def processHeat() {
 		def f = new File("c:\\files\\")
 		log.info ("Processing Heat ")
@@ -71,15 +113,11 @@ class EnergyReadingService {
 							def tmpHeatReading = fields[1]
 							def heatReading = tmpHeatReading.replaceAll('"', '').toFloat()
 							
-							println premise
-							println heatReading
-							println tmpFileDate
-
 							def tmpReading = new HeatReading(readingValueHeat:heatReading, fileDate:tmpFileDate, premise:premise).save()	
 												
-							//	log.info ("premise found")
+								log.info ("premise found")
 							} else {
-							//	log.warn("Premise not found: "+ fields[0])
+								log.warn("Premise not found: "+ fields[0])
 							}
 						}
 						file.renameTo(new File("c:\\files\\processed", file.name))

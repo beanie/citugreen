@@ -50,13 +50,12 @@ class BillUtil {
 	
 	
 	static Float calcWaterPriceByVolume(Double reading) {
-		return (reading*tarrifList.hotWaterTarrif)
+		return (reading*tarrifList.coldWaterTarrif)
 	}
 	static Float calcHotWaterPriceByVolume(Double reading) {
 		return (reading*tarrifList.hotWaterTarrif)
 	}
-	
-	static Float calcColdWaterPriceByVolume(Double reading) {
+		static Float calcColdWaterPriceByVolume(Double reading) {
 		return (reading*tarrifList.coldWaterTarrif)
 	}
 	

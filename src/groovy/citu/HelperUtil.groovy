@@ -126,11 +126,11 @@ class HelperUtil {
 		premise.put("waterTotalCostHot", BillUtil.calcTotalHotWaterCost(premiseInstance.waterReadings.readingValueHot))
 		premise.put("waterTotalCostCold", BillUtil.calcTotalColdWaterCost(premiseInstance.waterReadings.readingValueCold))
 		premise.put("waterTotalCostGrey", BillUtil.calcTotalGreyWaterCost(premiseInstance.waterReadings.readingValueGrey))
-		premise.put("waterAverageUsageHot", BillUtil.calcHotWaterPriceByVolume((premise.hotWaterTotalUsage/premiseInstance.waterReadings.size())*premiseInstance.waterReadings.size()))
-		premise.put("waterAverageUsageCold", BillUtil.calcColdWaterPriceByVolume((premise.coldWaterTotalUsage/premiseInstance.waterReadings.size())*premiseInstance.waterReadings.size()))
-		premise.put("waterAverageUsageGrey", BillUtil.calcGreyWaterPriceByVolume((premise.greyWaterTotalUsage/premiseInstance.waterReadings.size())*premiseInstance.waterReadings.size()))
-		premise.put("waterAvgUsage", premise.waterTotalUsage/premiseInstance.waterReadings.size()) //done
-		premise.put("waterPeerAvg", swingData.peerAvg/premiseInstance.waterReadings.size())
+	//	premise.put("waterAverageUsageHot", BillUtil.calcHotWaterPriceByVolume((premise.hotWaterTotalUsage/premiseInstance.waterReadings.size())*premiseInstance.waterReadings.size()))
+	//	premise.put("waterAverageUsageCold", BillUtil.calcColdWaterPriceByVolume((premise.coldWaterTotalUsage/premiseInstance.waterReadings.size())*premiseInstance.waterReadings.size()))
+	//	premise.put("waterAverageUsageGrey", BillUtil.calcGreyWaterPriceByVolume((premise.greyWaterTotalUsage/premiseInstance.waterReadings.size())*premiseInstance.waterReadings.size()))
+	//	premise.put("waterAvgUsage", premise.waterTotalUsage/premiseInstance.waterReadings.size()) //done
+	//	premise.put("waterPeerAvg", swingData.peerAvg/premiseInstance.waterReadings.size())
 
 		return premise
 	}

@@ -25,7 +25,7 @@ class PremiseController extends BaseController {
 		def Premise premiseInstance = HelperUtil.getPremise(params)
 
 		if (!premiseInstance) {
-			render("invalid premise ID")
+			render("200":"invalid premise id")
 		} else {
 			[simpleView: simpleViewMap(params)]
 		}
@@ -39,7 +39,7 @@ class PremiseController extends BaseController {
 		log.info ("Requesting premise "+premiseInstance)
 
 		if (!premiseInstance) {
-			render("invalid premise ID")
+			render("200":"invalid premise id")
 		} else {
 			render simpleViewMap(params) as JSON
 		}
@@ -54,7 +54,7 @@ class PremiseController extends BaseController {
 		
 		if (!premiseInstance) {
 			
-			render("invalid premise ID")
+			render("200":"invalid premise ID")
 			
 		} else {
 			
@@ -131,6 +131,7 @@ class PremiseController extends BaseController {
 			view = createViewJsonObject(premiseInstance, now, "year", params.utilType)
 		} else {
 			log.warn("Invalid date params sent")
+			render("300":"invalid date requested")
 			return null
 		}
 
@@ -152,7 +153,7 @@ class PremiseController extends BaseController {
 				if (premiseInstance.elecReadings.size() > 0) {
 					HelperUtil.createElectricityMap(premiseInstance, premise, swingData)
 				} else {
-					premise = ["error":"No Elec Data for specified period"]
+					premise = ["310":"No Elec Data for specified period"]
 				}
 			} else if (utilType.equals("water")) {
 				premiseInstance.waterReadings = WaterReading.findAllByPremiseAndDateCreatedBetween(premiseInstance, now.toDate(), endOfDay.toDate(), [sort:"dateCreated", order:"desc"])
@@ -160,11 +161,11 @@ class PremiseController extends BaseController {
 				if (premiseInstance.waterReadings.size() > 0) {
 					HelperUtil.createWaterMap(premiseInstance, premise, swingData)
 				} else {
-					premise = ["error":"No Water Data for specified period"]
+					premise = ["311":"No Water Data for specified period"]
 				}
 			} else if (utilType.equals("heat")) {
 			
-					premise = ["error":"No Heat Data for specified day period"]
+				premise = ["error":"No Heat Data for specified day period"]
 			}
 		
 		} else {
@@ -191,7 +192,7 @@ class PremiseController extends BaseController {
 					def elecDay = ElecReading.findAllByPremiseAndDateCreatedBetween(premiseInstance, now.toDate(), endOfDay.toDate(), [sort:"dateCreated", order:"desc"])
 					electricityReadings.add(new ElecReading(readingValueElec:BillUtil.calcTotal(elecDay.readingValueElec), dateCreated:now.toDate()))
 					def heatDay = HeatReading.findAllByPremiseAndDateCreatedBetween(premiseInstance, now.toDate(), endOfDay.toDate(), [sort:"fileDate", order:"desc"])
-					electricityReadings.add(new ElecReading(readingValueElec:BillUtil.calcTotal(elecDay.readingValueElec), dateCreated:now.toDate()))
+					heatReadings.add(new HeatReading(readingValueHeat:BillUtil.calcTotal(elecDay.readingValueHeat), dateCreated:now.toDate()))
 					def waterDay = WaterReading.findAllByPremiseAndDateCreatedBetween(premiseInstance, now.toDate(), endOfDay.toDate(), [sort:"dateCreated", order:"desc"])
 					waterReadings.add(new WaterReading(readingValueHot:BillUtil.calcTotal(waterDay.readingValueHot), readingValueCold:BillUtil.calcTotal(waterDay.readingValueCold), readingValueGrey:BillUtil.calcTotal(waterDay.readingValueGrey), dateCreated:now.toDate()))
 					now = now.plusDays(1)
@@ -247,7 +248,7 @@ class PremiseController extends BaseController {
 					log.debug("Dates : "+ now.toDate() +" : "+ monthEnd.toDate())
 					electricityReadings.add(new ElecReading(readingValueElec:BillUtil.calcTotal(elecMonth.readingValueElec), dateCreated:now.toDate()))
 					waterReadings.add(new WaterReading(readingValueHot:BillUtil.calcTotal(waterMonth.readingValueHot), readingValueCold:BillUtil.calcTotal(waterMonth.readingValueCold), readingValueGrey:BillUtil.calcTotal(waterMonth.readingValueGrey), dateCreated:now.toDate()))
-					heatReadings.add(new HeatReading(readingValueHeat:BillUtil.calcTotal(heatMonth.readingValueElec), dateCreated:now.toDate()))
+					heatReadings.add(new HeatReading(readingValueHeat:BillUtil.calcTotal(heatMonth.readingValueHeat), dateCreated:now.toDate()))
 					now = now.plusMonths(1)
 				}
 				
@@ -257,21 +258,21 @@ class PremiseController extends BaseController {
 				if (premiseInstance.elecReadings.size() > 0) {
 					HelperUtil.createElectricityMap(premiseInstance, premise, swingData)
 				} else {
-					premise = ["error":"No elec Data for specified period"]
+					premise = ["310":"No elec Data for specified period"]
 				}
 			} else if (utilType.equals("water")) {
 				premiseInstance.waterReadings = waterReadings
 				if (premiseInstance.waterReadings.size() > 0) {
 					HelperUtil.createWaterMap(premiseInstance, premise, swingData)
 				} else {
-					premise = ["error":"No water Data for specified period"]
+					premise = ["311":"No water Data for specified period"]
 				}
 			} else if (utilType.equals("heat")) {
 				premiseInstance.heatReadings = heatReadings
 				if (premiseInstance.heatReadings.size() > 0) {
 					HelperUtil.createHeatMap(premiseInstance, premise, swingData)
 				} else {
-					premise = ["error":"No heat Data for specified period"]
+					premise = ["312":"No heat Data for specified period"]
 				}
 			}
 		}
@@ -351,7 +352,7 @@ class PremiseController extends BaseController {
 		if (waterReadings.size() > 0) {
 			waterReadings.sort()
 			swingometer.put("swingLow", BillUtil.calcWaterPriceByVolume(waterReadings[0]))
-			swingometer.put("swingHigh", BillUtil.calcWaterPriceByVolume(waterReadings[waterReadings]))
+			swingometer.put("swingHigh", BillUtil.calcWaterPriceByVolume(waterReadings[waterReadings.size()-1]))
 			swingometer.put("peerAvg", (tmpWaterFloat / waterReadings.size()))
 		} else {
 			swingometer.put("swingLow", 0)
