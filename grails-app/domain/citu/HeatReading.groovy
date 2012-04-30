@@ -6,5 +6,7 @@ class HeatReading extends Reading {
 	Float realReadingHeat
 
     static constraints = {
+		readingValueHeat(nullable: true)
+		realReadingHeat(nullable: true)
     }
 }
