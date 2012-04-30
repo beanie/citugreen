@@ -99,8 +99,9 @@ class HelperUtil {
 	
 	static Map createHeatMap(Premise premiseInstance, Map premise, Map swingData) {
 		ArrayList heatReadings = new ArrayList()
-		premiseInstance.elecReadings.each { reading ->
-			heatReadings.add([readingValue:reading.readingValueheat, dateTime:reading.dateCreated])
+		premiseInstance.heatReadings.each { reading ->
+			heatReadings.add([readingValue:reading.readingValueHeat, dateTime:reading.dateCreated])
+			
 		}
 		premise.put("readings", heatReadings)
 		premise.put("heatTotalUsage", BillUtil.calcTotal(premiseInstance.heatReadings.readingValueHeat)) //done

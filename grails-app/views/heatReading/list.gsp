@@ -28,11 +28,9 @@
                         
                             <g:sortableColumn property="fileDate" title="${message(code: 'heatReading.fileDate.label', default: 'File Date')}" />
                         
-                            <g:sortableColumn property="dateCreated" title="${message(code: 'heatReading.dateCreated.label', default: 'Date Created')}" />
-                        
                             <g:sortableColumn property="readingValueHeat" title="${message(code: 'heatReading.readingValueHeat.label', default: 'Reading Value Heat')}" />
                         
-                            <g:sortableColumn property="realReadingHeat" title="${message(code: 'heatReading.realReadingHeat.label', default: 'Real Reading Heat')}" />
+                            <g:sortableColumn property="dateCreated" title="${message(code: 'heatReading.dateCreated.label', default: 'Date Created')}" />
                         
                         </tr>
                     </thead>
@@ -46,11 +44,9 @@
                         
                             <td><g:formatDate date="${heatReadingInstance.fileDate}" /></td>
                         
-                            <td><g:formatDate date="${heatReadingInstance.dateCreated}" /></td>
-                        
                             <td>${fieldValue(bean: heatReadingInstance, field: "readingValueHeat")}</td>
                         
-                            <td>${fieldValue(bean: heatReadingInstance, field: "realReadingHeat")}</td>
+                            <td><g:formatDate date="${heatReadingInstance.dateCreated}" /></td>
                         
                         </tr>
                     </g:each>

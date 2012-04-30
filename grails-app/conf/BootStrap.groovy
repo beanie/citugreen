@@ -227,13 +227,13 @@ class BootStrap {
 			}
 
 		
-		if (!ElecReading.count()) {
-			def now = new Date()
+//		if (!ElecReading.count()) {
+//			def now = new Date()
 			
-			Premise p = Premise.findByFlatNo("215")
+//			Premise p = Premise.findByFlatNo("215")
 			
-			HeatReading tmpHeat = new HeatReading(readingValueHeat:14,fileDate:now, premise:p).save()
-			ElecReading tmpReading = new ElecReading(readingValueElec:14, fileDate:now, premise:p).save()
+//			HeatReading tmpHeat = new HeatReading(readingValueHeat:14,fileDate:now, premise:p).save()
+//			ElecReading tmpReading = new ElecReading(readingValueElec:14, fileDate:now, premise:p).save()
 			
 
 		//	Premise p = Premise.findByFlatNo("215")
@@ -262,7 +262,7 @@ class BootStrap {
 		//		}
 		//	}
 			
-		}
+	//	}
     }
     def destroy = {
     }

@@ -55,15 +55,6 @@
                                 </td>
                             </tr>
                         
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="realReadingHeat"><g:message code="heatReading.realReadingHeat.label" default="Real Reading Heat" /></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean: heatReadingInstance, field: 'realReadingHeat', 'errors')}">
-                                    <g:textField name="realReadingHeat" value="${fieldValue(bean: heatReadingInstance, field: 'realReadingHeat')}" />
-                                </td>
-                            </tr>
-                        
                         </tbody>
                     </table>
                 </div>

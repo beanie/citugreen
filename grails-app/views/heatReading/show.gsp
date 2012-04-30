@@ -44,13 +44,6 @@
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="heatReading.dateCreated.label" default="Date Created" /></td>
-                            
-                            <td valign="top" class="value"><g:formatDate date="${heatReadingInstance?.dateCreated}" /></td>
-                            
-                        </tr>
-                    
-                        <tr class="prop">
                             <td valign="top" class="name"><g:message code="heatReading.readingValueHeat.label" default="Reading Value Heat" /></td>
                             
                             <td valign="top" class="value">${fieldValue(bean: heatReadingInstance, field: "readingValueHeat")}</td>
@@ -58,9 +51,9 @@
                         </tr>
                     
                         <tr class="prop">
-                            <td valign="top" class="name"><g:message code="heatReading.realReadingHeat.label" default="Real Reading Heat" /></td>
+                            <td valign="top" class="name"><g:message code="heatReading.dateCreated.label" default="Date Created" /></td>
                             
-                            <td valign="top" class="value">${fieldValue(bean: heatReadingInstance, field: "realReadingHeat")}</td>
+                            <td valign="top" class="value"><g:formatDate date="${heatReadingInstance?.dateCreated}" /></td>
                             
                         </tr>
                     

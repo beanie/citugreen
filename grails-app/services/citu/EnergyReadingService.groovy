@@ -18,7 +18,7 @@ class EnergyReadingService {
 	
 		def now = new Date()
 		
-		Premise p = Premise.findByFlatNo("5")
+	//	Premise p = Premise.findByFlatNo("5")
 		//Premise p1 = Premise.findByFlatNo("606")
 		//Premise p2 = Premise.findByFlatNo("106")
 		//Premise p3 = Premise.findByFlatNo("608")
@@ -28,14 +28,14 @@ class EnergyReadingService {
 	
 		//ElecReading tmpReading = new ElecReading(readingValueElec:random.nextInt(8), dateCreated:now, premise:p1).save()
 		//ElecReading tmpReading1 = new ElecReading(readingValueElec:random.nextInt(8), dateCreated:now, premise:p2).save()
-		ElecReading tmpReading2 = new ElecReading(readingValueElec:random.nextInt(8), dateCreated:now, premise:p).save()
+	//	ElecReading tmpReading2 = new ElecReading(readingValueElec:random.nextInt(8), dateCreated:now, premise:p).save()
 		//ElecReading tmpReading3 = new ElecReading(readingValueElec:random.nextInt(8), dateCreated:now, premise:p3).save()
 		//ElecReading tmpReading4 = new ElecReading(readingValueElec:random.nextInt(8), dateCreated:now, premise:p4).save()
 		//WaterReading tmpWater = new WaterReading(dateCreated:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p1).save()
 		//WaterReading tmpWater1 = new WaterReading(dateCreated:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p2).save()
 		//WaterReading tmpWater2 = new WaterReading(dateCreated:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p3).save()
 		//WaterReading tmpWater3 = new WaterReading(dateCreated:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p4).save()
-		WaterReading tmpWater4 = new WaterReading(dateCreated:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p).save()
+	//	WaterReading tmpWater4 = new WaterReading(dateCreated:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p).save()
 
 	}
 	
@@ -50,48 +50,7 @@ class EnergyReadingService {
 	}
 	
 	
-	def processHeatPhil() {
-		def f = new File("c:\\files\\")
-		log.info ("Processing Heat ")
 		
-		
-		if( f.exists() ){
-			f.eachFile(){ file->
-				
-				if( !file.isDirectory() )
-					if (file.name.endsWith(".csv")) {
-						log.info("Processing CSV file : "+ file.name)
-						
-						SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd")
-						def tmpFileDate = df.parse(file.name.toString())
-						
-						CSVReader reader = new CSVReader (new FileReader(file))
-						
-						while ((nextLine = reader.readNext()) != null) {
-							
-							def flatId = nextLine[0]
-							
-							def premise = Premise.findByFlatNo(flatID)
-							if (premise){
-									def heatReading = nextLine[1]
-									def tmpHeatReading = new HeatReading(readingValueHeat:heatReading, fileDate:tmpFileDate,  premise:premise).save()			
-									
-									println ("Phils Heat Reading ")+ heatReading
-									println ("Phils Premise ")+premise
-									
-									log.info ("premise found")
-								} else {
-									log.warn("Premise not found: "+ fields[0])
-								}
-						}
-						file.renameTo(new File("c:\\files\\processed", file.name))
-						log.info("Processed CSV file : "+ file.name)
-					}
-			}
-		}
-	}
-	
-	
 	
 	def processHeat() {
 		def f = new File("c:\\files\\")
@@ -125,12 +84,13 @@ class EnergyReadingService {
 								
 								def tmpHeatRead = new HeatReading(premise:premise, readingValueHeat:heatReading, fileDate:tmpFileDate).save()
 												
-								log.info ("premise found")
+							//	log.info ("premise found")
 							} else {
 								log.warn("Premise not found: "+ fields[0])
 							}
 						}
 						file.renameTo(new File("c:\\files\\processed", file.name))
+						file.delete()
 						log.info("Processed CSV file : "+ file.name)
 					}
 			}
