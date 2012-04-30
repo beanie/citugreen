@@ -111,19 +111,19 @@ class EnergyReadingService {
 							
 							def tmpflatID = fields[0].toString()
 							def flatID = tmpflatID.replace(/"/, '')
-
-							def premise = Premise.findByFlatNo(flatID)
-							if (premise){
+							def premise = null
 							
-							def tmpHeatReading = fields[1]
-							def heatReadingt = tmpHeatReading.replaceAll('"', '')
-							def heatReading = heatReadingt.toFloat()
+							if (flatID) {
+								premise = Premise.findByFlatNo(flatID)
+							}
 							
-							def tmpReading = new HeatReading(readingValueHeat:heatReading, fileDate:2012-04-27, premise:premise).save()	
+							if (premise) {
 							
-							println heatReading
-							println tmpFileDate
-							println premise
+								def tmpHeatReading = fields[1]
+								def heatReadingt = tmpHeatReading.replaceAll('"', '')
+								def heatReading = heatReadingt.toFloat()
+								
+								def tmpHeatRead = new HeatReading(premise:premise, readingValueHeat:heatReading, fileDate:tmpFileDate).save()
 												
 								log.info ("premise found")
 							} else {
