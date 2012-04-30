@@ -1,11 +1,14 @@
 package citu
 
+import au.com.bytecode.opencsv.CSVReader;
+
 import groovyx.net.http.HTTPBuilder;
 import static groovyx.net.http.Method.GET;
 import static groovyx.net.http.ContentType.TEXT;
 import static groovyx.net.http.ContentType.XML;
 import groovy.util.XmlSlurper;
 import java.text.*;
+
 
 class EnergyReadingService {
 	
@@ -51,33 +54,35 @@ class EnergyReadingService {
 		def f = new File("c:\\files\\")
 		log.info ("Processing Heat ")
 		
+		
 		if( f.exists() ){
 			f.eachFile(){ file->
+				
 				if( !file.isDirectory() )
 					if (file.name.endsWith(".csv")) {
 						log.info("Processing CSV file : "+ file.name)
 						
 						SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd")
 						def tmpFileDate = df.parse(file.name.toString())
-				
-						file.splitEachLine(",") {fields ->
+						
+						CSVReader reader = new CSVReader (new FileReader(file))
+						
+						while ((nextLine = reader.readNext()) != null) {
 							
-							def tmpflatID = fields[0].toString()
-							def flatID = tmpflatID.replace(/"/, '')
-
+							def flatId = nextLine[0]
+							
 							def premise = Premise.findByFlatNo(flatID)
 							if (premise){
-							
-							def tmpHeatReading = fields[1]
-							def heatReading = tmpHeatReading.replaceAll('"', '').toFloat()
-							
-
-							def tmpReading = new HeatReading(readingValueHeat:heatReading, fileDate:tmpFileDate,  premise:premise).save()
-												
-							//	log.info ("premise found")
-							} else {
-							//	log.warn("Premise not found: "+ fields[0])
-							}
+									def heatReading = nextLine[1]
+									def tmpHeatReading = new HeatReading(readingValueHeat:heatReading, fileDate:tmpFileDate,  premise:premise).save()			
+									
+									println ("Phils Heat Reading ")+ heatReading
+									println ("Phils Premise ")+premise
+									
+									log.info ("premise found")
+								} else {
+									log.warn("Premise not found: "+ fields[0])
+								}
 						}
 						file.renameTo(new File("c:\\files\\processed", file.name))
 						log.info("Processed CSV file : "+ file.name)
@@ -99,7 +104,7 @@ class EnergyReadingService {
 						log.info("Processing CSV file : "+ file.name)
 						
 						SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd")
-						def tmpFileDate = df.parse(file.name.toString())
+						def tmpFileDate = df.parse(file.name)
 
 											
 						file.splitEachLine(",") {fields ->
@@ -111,9 +116,14 @@ class EnergyReadingService {
 							if (premise){
 							
 							def tmpHeatReading = fields[1]
-							def heatReading = tmpHeatReading.replaceAll('"', '').toFloat()
+							def heatReadingt = tmpHeatReading.replaceAll('"', '')
+							def heatReading = heatReadingt.toFloat()
 							
-							def tmpReading = new HeatReading(readingValueHeat:heatReading, fileDate:tmpFileDate, premise:premise).save()	
+							def tmpReading = new HeatReading(readingValueHeat:heatReading, fileDate:2012-04-27, premise:premise).save()	
+							
+							println heatReading
+							println tmpFileDate
+							println premise
 												
 								log.info ("premise found")
 							} else {
@@ -202,8 +212,7 @@ class EnergyReadingService {
 									def rawValueHot = (reading.item[1].rawvalue.toInteger())*10
 									def diffValueGrey = ((reading.item[2].rawvalue.toInteger())*10- lastGrey)
 									def rawValueGrey = (reading.item[2].rawvalue.toInteger())*10
-									
-						
+	
 									
 									def tmpReading = new WaterReading(fileDate:tmpFileDate, readingValueCold:diffValueCold, realValueCold:rawValueCold, readingValueHot:diffValueHot, realValueHot:rawValueHot, readingValueGrey:diffValueGrey, realValueGrey:rawValueGrey, premise:premise).save()
 									

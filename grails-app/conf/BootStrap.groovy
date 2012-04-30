@@ -221,23 +221,32 @@ class BootStrap {
 			SetTopBox stb8 = new SetTopBox(macAddress:'44:58:29:17:C1:57', TSMid:'36315464', premise:Flat8).save()
 			SetTopBox stb9 = new SetTopBox(macAddress:'44:58:29:17:C1:58', TSMid:'6345345', premise:Flat9).save()
 			SetTopBox stb12 = new SetTopBox(macAddress:'44:58:29:17:C1:59', TSMid:'6345345', premise:Flat12).save()
-		}
+		
+		
+			
+			}
 
 		
-	//	if (!ElecReading.count()) {
-	//		def now = (new Date() - 50)
+		if (!ElecReading.count()) {
+			def now = new Date()
+			
+			Premise p = Premise.findByFlatNo("215")
+			
+			HeatReading tmpHeat = new HeatReading(readingValueHeat:14,fileDate:now, premise:p).save()
+			ElecReading tmpReading = new ElecReading(readingValueElec:14, fileDate:now, premise:p).save()
+			
 
-	//		Premise p = Premise.findByFlatNo("215")
+		//	Premise p = Premise.findByFlatNo("215")
 	//		Premise p1 = Premise.findByFlatNo("606")
 	//		Premise p2 = Premise.findByFlatNo("106")
 	//		Premise p3 = Premise.findByFlatNo("608")
-	// 	Premise p4 = Premise.findByFlatNo("610")
+	// 		Premise p4 = Premise.findByFlatNo("610")
 			
 	//		def random = new Random()
 			
-	//		50.times {
-			//	now = (now + 1)
-		//		24.times{
+	//		4.times {
+	//			now = (now + 1)
+	//			7.times{
 				//	ElecReading tmpReading = new ElecReading(readingValueElec:random.nextInt(8), fileDate:now, premise:p1).save()
 				//	ElecReading tmpReading1 = new ElecReading(readingValueElec:random.nextInt(8), fileDate:now, premise:p2).save()
 				//	ElecReading tmpReading2 = new ElecReading(readingValueElec:random.nextInt(8), fileDate:now, premise:p).save()
@@ -248,11 +257,12 @@ class BootStrap {
 				//	WaterReading tmpWater2 = new WaterReading(fileDate:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p3).save()
 				//	WaterReading tmpWater3 = new WaterReading(fileDate:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p4).save()
 				//	WaterReading tmpWater4 = new WaterReading(fileDate:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p).save()
-					//HeatReading tmpHeat = new HeatReading(heatReading:random.nextInt(60), heatCost:0, premise:p).save()
-			//	}
+				//	HeatReading tmpHeat = new HeatReading(readingValueHeat:random.nextInt(60),fileDate:now, premise:p).save()
+					
+		//		}
 		//	}
 			
-		//}
+		}
     }
     def destroy = {
     }

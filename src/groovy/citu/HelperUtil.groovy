@@ -44,8 +44,8 @@ class HelperUtil {
 		heat.put("currentCost", BillUtil.calcHeatPriceByVolume(nullCheck(sum)))
 		heat.put("averageCost", BillUtil.calcHeatPriceByVolume(nullCheck(avg)*24))
 		heat.put("estimateCost", BillUtil.calcHeatPriceByVolume(nullCheck(sum)+2))
-		heat.put("swingLow", BillUtil.calcHeatPriceByVolume(nullCheck(highlows?.elec?.low)))
-		heat.put("swingHigh", BillUtil.calcHeatPriceByVolume(nullCheck(highlows?.elec?.high)))
+		heat.put("swingLow", BillUtil.calcHeatPriceByVolume(nullCheck(highlows?.heat?.low)))
+		heat.put("swingHigh", BillUtil.calcHeatPriceByVolume(nullCheck(highlows?.heat?.high)))
 		return heat
 	}
 

@@ -22,7 +22,7 @@ class ReadingController {
 	}
 	
 	def processHeatReadings = {
-		energyReadingService.processHeat()
+		energyReadingService.processHeatPhil()
 		render("Manually processed Heat Readings")
 	}
 }
