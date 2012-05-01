@@ -200,7 +200,7 @@ class PremiseController extends BaseController {
 					def elecDay = ElecReading.findAllByPremiseAndDateCreatedBetween(premiseInstance, now.toDate(), endOfDay.toDate(), [sort:"dateCreated", order:"desc"])
 					electricityReadings.add(new ElecReading(readingValueElec:BillUtil.calcTotal(elecDay.readingValueElec), dateCreated:now.toDate()))
 					def heatDay = HeatReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), endOfDay.toDate(), [sort:"dateCreated", order:"desc"])
-					heatReadings.add(new HeatReading(readingValueHeat:BillUtil.calcTotal(elecDay.readingValueHeat), dateCreated:FileDate))
+					heatReadings.add(new HeatReading(readingValueHeat:BillUtil.calcTotal(heatDay.readingValueHeat), dateCreated:now.toDate()))
 					def waterDay = WaterReading.findAllByPremiseAndDateCreatedBetween(premiseInstance, now.toDate(), endOfDay.toDate(), [sort:"dateCreated", order:"desc"])
 					waterReadings.add(new WaterReading(readingValueHot:BillUtil.calcTotal(waterDay.readingValueHot), readingValueCold:BillUtil.calcTotal(waterDay.readingValueCold), readingValueGrey:BillUtil.calcTotal(waterDay.readingValueGrey), dateCreated:now.toDate()))
 					now = now.plusDays(1)

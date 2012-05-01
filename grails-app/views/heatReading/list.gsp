@@ -24,7 +24,9 @@
                         
                             <g:sortableColumn property="id" title="${message(code: 'heatReading.id.label', default: 'Id')}" />
                         
-                            <th><g:message code="heatReading.premise.label" default="Premise" /></th>
+                       <!--  <th><g:message code="heatReading.premise.label" default="Premise" /></th> -->
+                        
+                       		<g:sortableColumn property="premise" title="${message(code: 'heatReading.premise.label', default: 'premise')}" />               
                         
                             <g:sortableColumn property="fileDate" title="${message(code: 'heatReading.fileDate.label', default: 'File Date')}" />
                         
