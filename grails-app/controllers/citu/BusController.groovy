@@ -33,6 +33,8 @@ class BusController {
 		def timeTable = new ArrayList()
 		def map
 		
+		log.info("request for "+busRef.toString())
+		
 		url.withReader { reader ->
 			
 			def html = slurper.parse(reader)

@@ -42,11 +42,13 @@ class EnergyReadingService {
 	def processElec() {
 		def elecUrls = EnergyFileRef.findAllByCategory('Electricity')
 		processXml(elecUrls)
+		log.info ("Processing Elec")
 	}
 	
 	def processWater() {
 		def waterUrls = EnergyFileRef.findAllByCategory('Water')
 		processXml(waterUrls)
+		log.info ("Processing Water")
 	}
 	
 	
@@ -54,7 +56,7 @@ class EnergyReadingService {
 	
 	def processHeat() {
 		def f = new File("c:\\files\\")
-		log.info ("Processing Heat ")
+		log.info ("Processing Heat")
 		
 		if( f.exists() ){
 			f.eachFile(){ file->

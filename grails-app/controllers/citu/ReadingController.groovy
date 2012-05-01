@@ -1,7 +1,7 @@
 package citu
 
 class ReadingController {
-
+	
 	EnergyReadingService energyReadingService
 	
 	def scaffold = true
