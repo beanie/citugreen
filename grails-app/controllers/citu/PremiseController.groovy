@@ -437,6 +437,49 @@ class PremiseController extends BaseController {
 		return readings
 	}
 	
+	Map getWeekPrediction() {
+		
+		def elecDataSet = new DataSet()
+		
+		Observation elecObservation = new Observation(36)
+		elecObservation.setIndependentValue("date", 1)
+		elecDataSet.add(elecObservation)
+		
+		Observation elecObservation1 = new Observation(39)
+		elecObservation1.setIndependentValue("date", 2)
+		elecDataSet.add(elecObservation1)
+		
+		Observation elecObservation2 = new Observation(46)
+		elecObservation2.setIndependentValue("date", 3)
+		elecDataSet.add(elecObservation2)
+		
+		Observation elecObservation3 = new Observation(32)
+		elecObservation3.setIndependentValue("date", 4)
+		elecDataSet.add(elecObservation3)
+		
+		ForecastingModel model = Forecaster.getBestForecast(elecDataSet)
+		model.init(elecDataSet)
+		
+		DataPoint fcDataPoint4 = new Observation(0.0)
+		fcDataPoint4.setIndependentValue("date", 5)
+		
+		// Create forecast data set and add these DataPoints
+		DataSet fcDataSet = new DataSet();
+		fcDataSet.add(fcDataPoint4);
+		
+		Iterator itt = fcDataSet.iterator();
+		Double value=0.0;
+		while (itt.hasNext()) {
+			DataPoint dp = (DataPoint) itt.next();
+			double forecastValue = dp.getDependentValue();
+			value = forecastValue;
+		}
+		
+		model.forecast(fcDataPoint4)
+		log.info("HERE COMES THE MONEY SHOT")
+		log.info(fcDataPoint4.getDependentValue())
+	}
+	
 	Map getPredictedPrice() {
 
 		def now = new DateTime()
