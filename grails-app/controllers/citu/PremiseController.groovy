@@ -116,10 +116,13 @@ class PremiseController extends BaseController {
 
 			if (params.week) {
 				log.info("simpleViewMap - Week View - with date : "+ now)
+				def tmpStat = new Stats(premise:premiseInstance, logCode:'heat', logMessage:'week View').save()
 				view = createViewJsonObject(premiseInstance, now, "week", params.utilType)
 			} else {
 				log.info("simpleViewMap - Day View - with date : "+ now)
+				def tmpStat = new Stats(logCode:'heat', logMessage:'dayViewRequested', messageType:'info',premise:premiseInstance, ).save()
 				view = createViewJsonObject(premiseInstance, now, "day", params.utilType)
+				
 			}
 		} else if (params.month && params.year) {
 
@@ -170,6 +173,8 @@ class PremiseController extends BaseController {
 				swingData = getHeatSwingometer(premiseInstance.bedrooms, now.toDate(), endOfDay.toDate())
 				if (premiseInstance.heatReadings.size() > 0) {
 					HelperUtil.createHeatMap(premiseInstance, premise, swingData)
+					
+					
 
 				} else {
 					premise = ["312":"No Heat Data for specified period"]
@@ -199,7 +204,7 @@ class PremiseController extends BaseController {
 					def endOfDay = now.plusDays(1).minusSeconds(1)
 					def elecDay = ElecReading.findAllByPremiseAndDateCreatedBetween(premiseInstance, now.toDate(), endOfDay.toDate(), [sort:"dateCreated", order:"desc"])
 					electricityReadings.add(new ElecReading(readingValueElec:BillUtil.calcTotal(elecDay.readingValueElec), dateCreated:now.toDate()))
-					def heatDay = HeatReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), endOfDay.toDate(), [sort:"dateCreated", order:"desc"])
+					def heatDay = HeatReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), endOfDay.toDate(), [sort:"fileDate", order:"desc"])
 					heatReadings.add(new HeatReading(readingValueHeat:BillUtil.calcTotal(heatDay.readingValueHeat), dateCreated:now.toDate()))
 					def waterDay = WaterReading.findAllByPremiseAndDateCreatedBetween(premiseInstance, now.toDate(), endOfDay.toDate(), [sort:"dateCreated", order:"desc"])
 					waterReadings.add(new WaterReading(readingValueHot:BillUtil.calcTotal(waterDay.readingValueHot), readingValueCold:BillUtil.calcTotal(waterDay.readingValueCold), readingValueGrey:BillUtil.calcTotal(waterDay.readingValueGrey), dateCreated:now.toDate()))
@@ -257,7 +262,7 @@ class PremiseController extends BaseController {
 					def monthEnd = now.plusDays((monthDays - now.getDayOfMonth())+1).minusSeconds(1)
 					def elecMonth = ElecReading.findAllByPremiseAndDateCreatedBetween(premiseInstance, now.toDate(), monthEnd.toDate(), [sort:"dateCreated", order:"desc"])
 					def waterMonth = WaterReading.findAllByPremiseAndDateCreatedBetween(premiseInstance, now.toDate(), monthEnd.toDate(), [sort:"dateCreated", order:"desc"])
-					def heatMonth = HeatReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), monthEnd.toDate(), [sort:"dateCreated", order:"desc"])
+					def heatMonth = HeatReading.findAllByPremiseAndFileDateBetween(premiseInstance, now.toDate(), monthEnd.toDate(), [sort:"fileDate", order:"desc"])
 					log.debug("Dates : "+ now.toDate() +" : "+ monthEnd.toDate())
 					electricityReadings.add(new ElecReading(readingValueElec:BillUtil.calcTotal(elecMonth.readingValueElec), dateCreated:now.toDate()))
 					waterReadings.add(new WaterReading(readingValueHot:BillUtil.calcTotal(waterMonth.readingValueHot), readingValueCold:BillUtil.calcTotal(waterMonth.readingValueCold), readingValueGrey:BillUtil.calcTotal(waterMonth.readingValueGrey), dateCreated:now.toDate()))
