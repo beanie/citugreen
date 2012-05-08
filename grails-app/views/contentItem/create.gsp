@@ -40,7 +40,7 @@
                                     <label for="messageType"><g:message code="contentItem.messageType.label" default="Message Type" /></label>
                                 </td>
                                 <td valign="top" class="value ${hasErrors(bean: contentItemInstance, field: 'messageType', 'errors')}">
-                                    <g:select name="messageType" from="${['usageTip', 'Local Amenities', 'Energy Saving Devices','Facilities','Managing Agent','Introduction','Useful Contacts','Concierge Caretaker','Apt Services','Safety Security']}" value="${contentItemInstance?.messageType}" />
+                                    <g:select name="messageType" from="${['usageTip', 'Local Amenities','Events', 'Energy Saving Devices','Facilities','Managing Agent','Introduction','Useful Contacts','Concierge Caretaker','Apt Services','Safety Security','Greenhouse Facilities']}" value="${contentItemInstance?.messageType}" />
                                 </td>
                             </tr>
                             

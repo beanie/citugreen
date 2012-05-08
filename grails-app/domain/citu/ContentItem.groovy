@@ -17,6 +17,6 @@ class ContentItem {
 		contentBody(nullable:false, maxSize:100000)
 		image1(blank:true, nullable:true)
 		image2(blank:true, nullable:true)
-		messageType(inList:['usageTip', 'Local Amenities', 'Events','Energy Saving Devices','Facilities','Managing Agent','Introduction','Useful Contacts','Concierge Caretaker','Apt Services','Safety Security','Greenhouse Facilities',],blank:false)
+		messageType(inList:['usageTip', 'Local Amenities', 'Events','Energy Saving Devices','Facilities','Managing Agent','Introduction','Useful Contacts','Concierge Caretaker','Apt Services','Safety Security','Greenhouse Facilities'],blank:false)
     }
 }
