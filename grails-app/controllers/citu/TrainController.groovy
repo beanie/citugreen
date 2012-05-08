@@ -8,78 +8,59 @@ import grails.converters.*
 class TrainController {
 
     def  getTrainDepartureTimes = {
-				
-		def tagSoupParser = new org.ccil.cowan.tagsoup.Parser()
-		def slurper = new XmlSlurper(tagSoupParser)
+
+		def slurper = new XmlSlurper(new org.ccil.cowan.tagsoup.Parser())
+		def url = new URL("http://ojp.nationalrail.co.uk/service/ldbboard/dep/LDS")
+
 		def timeTable = new ArrayList()
 		def map
-		
-		def htmlParser = slurper.parse("http://www.eastcoast.co.uk/travel-information/live-train-times/leeds-departures/")
-			
-			String destination = ""
-			String trainDeparture = ""
-			
-			def timeList = []
-			def trainList = []
-			 
-		
-			htmlParser.'**'.findAll{ it.@class == 'trainstatus'
-			}.each {
+
+		url.withReader { reader ->
+			def html = new XmlSlurper(new org.ccil.cowan.tagsoup.Parser()).parse(reader)
+
+			def rows = html.'**'.findAll {it.name() == "tr"}
+
+			rows[1..rows.size()-1].each {row ->
 				
-				timeList.add(htmlParser.'**'.find{ it.@class == 'servicetime'
-				})			
-				trainList.add(htmlParser.'**'.find{ it.@class == 'stationname'
-				})
-			
-				println timeList[5]
-				println trainList[5]
-			}
-			
-			
-
-	//		def x = 0
-	//		for ( i in trainStatus ) {
-			//	destination = mainDestinations[x].toString()
-			//	trainDeparture = trainDepartures[x].toString()	
-			//	map = [destination:destination, trainDeparture:trainDeparture]
-			//	timeTable.add(map)
-			//	x++
-		//	}
-		
-		render timeTable as JSON
-	}
-
-def  getTrainArrivalTimes = {
 	
-	def slurper = new XmlSlurper(new org.ccil.cowan.tagsoup.Parser())
-	def url = new URL("http://www.eastcoast.co.uk/travel-information/live-train-times/leeds-arrivals/")
-	def timeTable = new ArrayList()
-	def map
-
-	url.withReader { reader ->
-
-		def html = slurper.parse(reader)
-
-			String origin = ""
-			String trainArrival = ""
-
-			def trainStatus = html.'**'.findAll{ it.@class == 'trainstatus'
-			}
-			def trainArrivals = html.'**'.findAll{ it.@class == 'servicetime'
-			}
-			def origins = html.'**'.findAll{ it.@class == 'stationname'
-			}
-
-			def x = 0
-			for ( i in trainStatus ) {
-				origin  = origins[x].toString()
-				trainArrival = trainArrivals[x].toString()
-				map = [origin:origin, trainArrival:trainArrival]
+				map = [destination:row.td[1].toString().replaceAll('[\n\r]', '').trim(),trainDeparture:row.td[0].toString(), trainStatus:row.td[2].toString(), trainPlatform:row.td[3].toString()]
 				timeTable.add(map)
-				x++
-				}
+
+			}
 		}
-	render timeTable as JSON
-	}
+		
+			Date tmpDate = new Date()
+			def tmpStat = new Stats(logCode:'train', dateNow:tmpDate, logMessage:'depart', messageType:'info').save()
+
+
+		render timeTable as JSON 
 }
 
+def  getTrainArrivalTimes = {
+
+		def slurper = new XmlSlurper(new org.ccil.cowan.tagsoup.Parser())
+		def url = new URL("http://ojp.nationalrail.co.uk/service/ldbboard/arr/LDS")
+
+		def timeTable = new ArrayList()
+		def map
+
+
+		url.withReader { reader ->
+			def html = new XmlSlurper(new org.ccil.cowan.tagsoup.Parser()).parse(reader)
+
+			def rows = html.'**'.findAll {it.name() == "tr"}
+
+			rows[1..rows.size()-1].each {row ->
+
+				map = [origin:row.td[1].toString().replaceAll('[\n\r]', '').trim(), trainArrival:row.td[0].toString(), trainDue:row.td[2].toString(), trainPlatform:row.td[3].toString()]
+				timeTable.add(map)
+
+			}
+		}
+		
+			Date tmpDate = new Date()
+			def tmpStat = new Stats(logCode:'train', dateNow:tmpDate, logMessage:'arrival', messageType:'info').save()
+
+		render timeTable as JSON
+	}
+}

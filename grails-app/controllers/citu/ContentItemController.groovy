@@ -138,6 +138,10 @@ class ContentItemController extends BaseController {
 			}			
 			contentList.add(map)
 		}
+		
+		Date tmpDate = new Date()
+		def tmpStat = new Stats(logCode:'content', dateNow:tmpDate, logMessage:'content request', messageType:'info').save()
+
 		render contentList as JSON
 	}
 }

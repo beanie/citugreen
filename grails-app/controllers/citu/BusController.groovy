@@ -33,7 +33,6 @@ class BusController {
 		def timeTable = new ArrayList()
 		def map
 		
-		log.info("request for "+busRef.toString())
 		
 		url.withReader { reader ->
 			
@@ -61,6 +60,10 @@ class BusController {
 			}
 		}
 		
+			Date tmpDate = new Date()
+			def tmpStat = new Stats(logCode:'bus', dateNow:tmpDate, logMessage:busStop, messageType:'info').save()
+
+
 		render timeTable as JSON
 	}
 }

@@ -107,6 +107,7 @@ class PremiseController extends BaseController {
 
 		def now
 		def view
+		def logM
 
 		def Premise premiseInstance = HelperUtil.getPremise(params)
 
@@ -116,29 +117,40 @@ class PremiseController extends BaseController {
 
 			if (params.week) {
 				log.info("simpleViewMap - Week View - with date : "+ now)
-				def tmpStat = new Stats(premise:premiseInstance, logCode:'heat', logMessage:'week View').save()
+				logM = "week"
+				
 				view = createViewJsonObject(premiseInstance, now, "week", params.utilType)
 			} else {
 				log.info("simpleViewMap - Day View - with date : "+ now)
-				def tmpStat = new Stats(logCode:'heat', logMessage:'dayViewRequested', messageType:'info',premise:premiseInstance, ).save()
-				view = createViewJsonObject(premiseInstance, now, "day", params.utilType)
+				logM = "Day"
+				
+					view = createViewJsonObject(premiseInstance, now, "day", params.utilType)
 				
 			}
 		} else if (params.month && params.year) {
 
 			now = new DateTime(params.int("year"), params.int("month"), 1, 0, 0, 0, 0)
+			
 			log.info("simpleViewMap - Month View - with date : "+ now)
+			logM = "Month"
+			
 			view = createViewJsonObject(premiseInstance, now, "month", params.utilType)
 		} else if (params.year) {
 
 			now = new DateTime(params.int("year"), 1, 1, 0, 0, 0, 0)
 			log.info("simpleViewMap - Year View - with date : "+ now)
+			logM = "Year"
+				
 			view = createViewJsonObject(premiseInstance, now, "year", params.utilType)
 		} else {
 			log.warn("Invalid date params sent")
 			render("300":"invalid date requested")
 			return null
 		}
+		
+		Date tmpDate = new Date() 
+		
+		def tmpStat = new Stats(logCode:params.utilType, dateNow:tmpDate, logMessage:logM, messageType:'energy',premise:premiseInstance, ).save()
 
 		return view
 	}

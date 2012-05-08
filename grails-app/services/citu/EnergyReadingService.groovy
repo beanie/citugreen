@@ -180,6 +180,7 @@ class EnergyReadingService {
 									
 									}
 							} else {
+							
 								log.warn("Premise not found: "+ reading.name.toString())
 							}
 						}
@@ -189,6 +190,8 @@ class EnergyReadingService {
 					// handler for any failure status code:
 					response.failure = { resp ->
 						log.error("Unexpected error: ${resp.status} : ${resp.statusLine.reasonPhrase}")
+						Date tmpDate = new Date()
+							
 					}
 				}
 			} catch (Exception e) {
