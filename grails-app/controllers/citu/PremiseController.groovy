@@ -90,13 +90,13 @@ class PremiseController extends BaseController {
 			log.info("heat avg Reading : "+ avgHeat[0])
 			log.info("heat Reading : "+ sumHeat[0])
 			
-			premise.put("electricity", HelperUtil.generateElecSummary(sumElec[0], highlows, avgElec[0]), getDayPrediction(premise.flatNo))
+			def predictions = getDayPrediction(premise.flatNo)
+			
+			premise.put("electricity", HelperUtil.generateElecSummary(sumElec[0], highlows, avgElec[0], predictions.elecEstimate))
 			premise.put("heat", HelperUtil.generateHeatSummary(sumHeat[0], highlows, avgHeat[0]))
 			premise.put("hotWater", HelperUtil.generateHotWaterSummary(sumWater[0][0], highlows, avgWater[0][0]))
 			premise.put("coldWater", HelperUtil.generateColdWaterSummary(sumWater[0][1], highlows, avgWater[0][1]))
 			premise.put("greyWater", HelperUtil.generateGreyWaterSummary(sumWater[0][2], highlows, avgWater[0][2]))
-			
-			// TODO getPredictedPrice()
 			
 			render premise as JSON
 		}
@@ -455,7 +455,9 @@ class PremiseController extends BaseController {
 		return readings
 	}
 	
-	Map getDayPrediction(int flatNo) {
+	Map getDayPrediction(String flatNo) {
+		
+		def flatForecast = [:]
 		
 		// get 2 days previous data
 		def now = new DateTime()
@@ -510,29 +512,36 @@ class PremiseController extends BaseController {
 		//observation1.setIndependentValue("month", 12)
 		//observation1.setIndependentValue("date", 20)
 		
-		ForecastingModel model = Forecaster.getBestForecast(elecDataSet)
-		model.init(elecDataSet)
-		
-		DataPoint fcDataPoint4 = new Observation(0.0)
-		fcDataPoint4.setIndependentValue("date", 5)
-		
-		// Create forecast data set and add these DataPoints
-		DataSet fcDataSet = new DataSet();
-		fcDataSet.add(fcDataPoint4);
-		
-		Iterator itt = fcDataSet.iterator();
-		Double value=0.0;
-		while (itt.hasNext()) {
-			DataPoint dp = (DataPoint) itt.next();
-			double forecastValue = dp.getDependentValue();
-			value = forecastValue;
+		if (elecDataSet) {
+			ForecastingModel model = Forecaster.getBestForecast(elecDataSet)
+			model.init(elecDataSet)
+			
+			DataPoint fcDataPoint4 = new Observation(0.0)
+			fcDataPoint4.setIndependentValue("date", 5)
+			
+			// Create forecast data set and add these DataPoints
+			DataSet fcDataSet = new DataSet();
+			fcDataSet.add(fcDataPoint4);
+			
+			Iterator itt = fcDataSet.iterator();
+			Double value=0.0;
+			while (itt.hasNext()) {
+				DataPoint dp = (DataPoint) itt.next();
+				double forecastValue = dp.getDependentValue();
+				value = forecastValue;
+			}
+			
+			model.forecast(fcDataPoint4)
+			log.debug("estimated elec value:")
+			log.debug(fcDataPoint4.getDependentValue())
+			flatForecast.put("elecEstimate", fcDataPoint4.getDependentValue())
+		} else {
+			flatForecast.put("elecEstimate", new Float(0))
+			flatForecast.put("heatEstimate", new Float(0))
 		}
 		
-		model.forecast(fcDataPoint4)
-		log.debug("estimated elec value:")
-		log.debug(fcDataPoint4.getDependentValue())
-		
-		def flatForecast = [elecEstimate: fcDataPoint4.getDependentValue()]
+		log.info(flatForecast)
+		return flatForecast
 		
 	}
 
