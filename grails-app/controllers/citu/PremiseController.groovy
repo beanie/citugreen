@@ -90,7 +90,7 @@ class PremiseController extends BaseController {
 			log.info("heat avg Reading : "+ avgHeat[0])
 			log.info("heat Reading : "+ sumHeat[0])
 			
-			premise.put("electricity", HelperUtil.generateElecSummary(sumElec[0], highlows, avgElec[0]))
+			premise.put("electricity", HelperUtil.generateElecSummary(sumElec[0], highlows, avgElec[0]), getDayPrediction(premise.flatNo))
 			premise.put("heat", HelperUtil.generateHeatSummary(sumHeat[0], highlows, avgHeat[0]))
 			premise.put("hotWater", HelperUtil.generateHotWaterSummary(sumWater[0][0], highlows, avgWater[0][0]))
 			premise.put("coldWater", HelperUtil.generateColdWaterSummary(sumWater[0][1], highlows, avgWater[0][1]))
@@ -455,25 +455,60 @@ class PremiseController extends BaseController {
 		return readings
 	}
 	
-	Map getWeekPrediction() {
+	Map getDayPrediction(int flatNo) {
+		
+		// get 2 days previous data
+		def now = new DateTime()
+		now = new DateTime(now.getYear(), now.getMonthOfYear(), now.getDayOfMonth(), 0, 0, 0, 0)
+		def yesterday = now.minusDays(1)
+		
+		log.info("Yesterday : "+ yesterday +" to "+ yesterday.plusDays(1).minusSeconds(1))
+		
+		def lastWeek = now.minusWeeks(1)
+		
+		log.info("Last Week : "+ lastWeek +" to "+ lastWeek.plusDays(1).minusSeconds(1))
 		
 		def elecDataSet = new DataSet()
 		
-		Observation elecObservation = new Observation(36)
-		elecObservation.setIndependentValue("date", 1)
-		elecDataSet.add(elecObservation)
+		def sum2WeeksPrev = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ flatNo +" and reading.fileDate between:date1 AND :date2 ", [date1:lastWeek.toDate(), date2:lastWeek.plusDays(1).minusSeconds(1).toDate()])
+		def sumWeekPrev = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ flatNo +" and reading.fileDate between:date1 AND :date2 ", [date1:lastWeek.minusWeeks(1).toDate(), date2:lastWeek.minusWeeks(1).plusDays(1).minusSeconds(1).toDate()])
+		def sum2DaysPrev = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ flatNo +" and reading.fileDate between:date1 AND :date2 ", [date1:yesterday.minusDays(1).toDate(), date2:yesterday.minusSeconds(1).toDate()])
+		def sumDayPrev = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ flatNo +" and reading.fileDate between:date1 AND :date2 ", [date1:yesterday.toDate(), date2:yesterday.plusDays(1).minusSeconds(1).toDate()])
 		
-		Observation elecObservation1 = new Observation(39)
-		elecObservation1.setIndependentValue("date", 2)
-		elecDataSet.add(elecObservation1)
+		log.info("Sum - "+ sum2WeeksPrev[0])
 		
-		Observation elecObservation2 = new Observation(46)
-		elecObservation2.setIndependentValue("date", 3)
-		elecDataSet.add(elecObservation2)
+		if (sum2WeeksPrev[0]) {
+			Observation elecObservation = new Observation(sum2WeeksPrev[0])
+			elecObservation.setIndependentValue("date", 1)
+			elecDataSet.add(elecObservation)
+		}
 		
-		Observation elecObservation3 = new Observation(32)
-		elecObservation3.setIndependentValue("date", 4)
-		elecDataSet.add(elecObservation3)
+		if (sumWeekPrev[0]) {
+			Observation elecObservation1 = new Observation(sumWeekPrev[0])
+			elecObservation1.setIndependentValue("date", 2)
+			elecDataSet.add(elecObservation1)
+		}
+		
+		if (sum2DaysPrev[0]) {
+			Observation elecObservation2 = new Observation(sum2DaysPrev[0])
+			elecObservation2.setIndependentValue("date", 3)
+			elecDataSet.add(elecObservation2)
+		}
+		
+		if (sumDayPrev[0]) {
+			Observation elecObservation3 = new Observation(sumDayPrev[0])
+			elecObservation3.setIndependentValue("date", 4)
+			elecDataSet.add(elecObservation3)
+		}
+		
+		/*
+		 * Do we need to break it down further by dates like this?
+		 */
+		// Create Observation for temperature measured on 2009/12/20
+		//Observation observation1 = new Observation(13.0)
+		//observation1.setIndependentValue("year",2009)
+		//observation1.setIndependentValue("month", 12)
+		//observation1.setIndependentValue("date", 20)
 		
 		ForecastingModel model = Forecaster.getBestForecast(elecDataSet)
 		model.init(elecDataSet)
@@ -494,133 +529,11 @@ class PremiseController extends BaseController {
 		}
 		
 		model.forecast(fcDataPoint4)
-		log.info("HERE COMES THE MONEY SHOT")
-		log.info(fcDataPoint4.getDependentValue())
-	}
-	
-	Map getPredictedPrice() {
-
-		def now = new DateTime()
-		now = new DateTime(now.getYear(), now.getMonthOfYear(), now.getDayOfMonth(), 0, 0, 0, 0)
-		def endOfDay = now.plusDays(1).minusSeconds(1)
-		/*
-		def x = 0
-		def y = 7
-		def elecDataSet = new DataSet();
+		log.debug("estimated elec value:")
+		log.debug(fcDataPoint4.getDependentValue())
 		
-		def sumElec = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = 610 and reading.fileDate between:date1 AND :date2 ", [date1:now.toDate(), date2:endOfDay.toDate()])
-		def sumElec1 = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = 610 and reading.fileDate between:date1 AND :date2 ", [date1:now.toDate()+1, date2:endOfDay.toDate()+1])
-		def sumElec2 = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = 610 and reading.fileDate between:date1 AND :date2 ", [date1:now.toDate()+2, date2:endOfDay.toDate()+2])
-		def sumElec3 = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = 610 and reading.fileDate between:date1 AND :date2 ", [date1:now.toDate()+3, date2:endOfDay.toDate()+3])
+		def flatForecast = [elecEstimate: fcDataPoint4.getDependentValue()]
 		
-		log.info(sumElec)
-		
-		Observation elecObservation = new Observation(sumElec[0])
-		elecObservation.setIndependentValue("date", x)
-		elecDataSet.add(elecObservation)
-		
-		Observation elecObservation1 = new Observation(sumElec1[0])
-		elecObservation1.setIndependentValue("date", x)
-		elecDataSet.add(elecObservation1)
-		
-		Observation elecObservation2 = new Observation(sumElec2[0])
-		elecObservation2.setIndependentValue("date", x)
-		elecDataSet.add(elecObservation2)
-		
-		Observation elecObservation3 = new Observation(sumElec3[0])
-		elecObservation3.setIndependentValue("date", x)
-		elecDataSet.add(elecObservation3)
-		
-		log.info(elecDataSet)
-		*/
-		
-		/*
-		while ( y-- > 0 ) {
-			def endOfDay = now.plusDays(1).minusSeconds(1)
-			x++
-			def sumElec = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = 610 and reading.fileDate between:date1 AND :date2 ", [date1:now.toDate(), date2:endOfDay.toDate()])
-			def elecObservation = new Observation(sumElec[0])
-			elecObservation.setIndependentValue("date", x)
-			elecDataSet.add(elecObservation)
-			now = now.plusDays(1)
-		}
-		
-		ForecastingModel model = Forecaster.getBestForecast(elecDataSet)
-		model.init(elecDataSet)
-		
-		DataPoint fcDataPoint4 = new Observation(0.0);
-		fcDataPoint4.setIndependentValue("date", x++);
-		
-		// Create forecast data set and add these DataPoints
-		DataSet fcDataSet = new DataSet();
-		fcDataSet.add(fcDataPoint4);
-		
-		Iterator itt = fcDataSet.iterator();
-		Double value=0.0;
-		while (itt.hasNext()) {
-			DataPoint dp = (DataPoint) itt.next();
-			double forecastValue = dp.getDependentValue();
-			value = forecastValue;
-		}
-		
-		model.forecast(fcDataPoint4);
-		log.info(BillUtil.calcElecPriceByVolume(fcDataPoint4.getDependentValue()));
-		*/
-		def x = 0
-		def y = 7
-		
-		def tmpObj = "observation"
-		
-		while ( y-- > 0 ) {
-			def tmpObj1 = tmpObj+x
-			//log.info(tmpObj1)
-			x++
-		}
-		
-		/*
-		def sumElec = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = 610 and reading.fileDate between:date1 AND :date2 ", [date1:now.toDate(), date2:endOfDay.toDate()])
-
-		
-		// Create Observation for temperature measured on 2009/12/20
-		Observation observation1 = new Observation(13.0)
-		observation1.setIndependentValue("year",2009)
-		observation1.setIndependentValue("month", 12)
-		observation1.setIndependentValue("date", 20)
-		
-		// Create Observation for temperature measured on 2009/12/21
-		Observation observation2 = new Observation(39.0)
-		observation2.setIndependentValue("year", 2009)
-		observation2.setIndependentValue("month", 12)
-		observation2.setIndependentValue("date", 21)
-		
-		// Create Observation for temperature measured on 2009/12/22
-		Observation observation3 = new Observation(42.0)
-		observation3.setIndependentValue("year", 2009)
-		observation3.setIndependentValue("month", 12)
-		observation3.setIndependentValue("date", 22)
-		
-		DataSet dataSet = new DataSet();
-		
-		// Add Observations to the DataSet
-		dataSet.add(observation1)
-		dataSet.add(observation2)
-		dataSet.add(observation3)
-		
-		ForecastingModel model = Forecaster.getBestForecast(dataSet)
-		model.init(dataSet)
-		
-		DataPoint fcDataPoint4 = new Observation(0.0);
-		fcDataPoint4.setIndependentValue("year", 2009);
-		fcDataPoint4.setIndependentValue("month", 12);
-		fcDataPoint4.setIndependentValue("date", 23);
-		
-		// Create forecast data set and add these DataPoints
-		DataSet fcDataSet = new DataSet();
-		fcDataSet.add(fcDataPoint4);
-		
-		model.forecast(fcDataPoint4);
-		//System.out.println(fcDataPoint4.getDependentValue());*/
-			
 	}
 
 }
