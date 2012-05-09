@@ -52,7 +52,7 @@ def  getTrainArrivalTimes = {
 
 			rows[1..rows.size()-1].each {row ->
 
-				map = [origin:row.td[1].toString().replaceAll('[\n\r]', '').trim(), trainArrival:row.td[0].toString(), trainDue:row.td[2].toString(), trainPlatform:row.td[3].toString()]
+				map = [origin:row.td[1].toString().replaceAll('[\n]', '').trim(), trainArrival:row.td[0].toString(), trainDue:row.td[2].toString(), trainPlatform:row.td[3].toString()]
 				timeTable.add(map)
 
 			}
