@@ -48,6 +48,35 @@ class PremiseController extends BaseController {
 	/*
 	 * Get the reading summary view for the landing page (test commit)
 	 */
+	
+	
+	def getBuildingReadingsSummary = {
+		
+			def now = new DateTime()
+			now = new DateTime(now.getYear(), now.getMonthOfYear(), now.getDayOfMonth(), 0, 0, 0, 0)
+			def endOfDay = now.plusDays(1).minusSeconds(1)
+			
+			/*
+			 * Pull back the sums for the summary
+			 */
+			def sumElec = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.dateCreated between:date1 AND :date2 ", [date1:now.toDate(), date2:endOfDay.toDate()])
+			def sumWater = WaterReading.executeQuery("select sum(reading.readingValueHot), sum(reading.readingValueCold), sum(reading.readingValueGrey) from WaterReading as reading where reading.dateCreated between:date1 AND :date2 ", [date1:now.toDate(), date2:endOfDay.toDate()])
+			def sumHeat = HeatReading.executeQuery("select sum(reading.readingValueHeat) from HeatReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.toDate(), date2:endOfDay.toDate()])
+			def sumEnergyIn = WaterReading.executeQuery("select sum(reading.")
+	
+			/*
+			 * Pull back the avg for the summary from today minus 7 days
+			 */
+			def avgElec = ElecReading.executeQuery("select avg(reading.readingValueElec) from ElecReading as reading where reading.dateCreated between:date1 AND :date2 ", [date1:now.toDate()-7, date2:now.toDate()])
+			def avgWater = WaterReading.executeQuery("select avg(reading.readingValueHot), avg(reading.readingValueCold), avg(reading.readingValueGrey) from WaterReading as reading where reading.dateCreated between:date1 AND :date2 ", [date1:now.toDate()-7, date2:now.toDate()])
+			def avgHeat = HeatReading.executeQuery("select avg(reading.readingValueHeat) from HeatReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.toDate()-7, date2:now.toDate()])
+
+		
+		//	render premise as JSON
+		}
+
+	
+	
 	def getReadingsSummary = {
 		
 		def Premise premiseInstance = HelperUtil.getPremise(params)

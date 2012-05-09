@@ -34,7 +34,7 @@ class BootStrap {
 			User kath = new User(userType: 'user', userName:'ksmith', firstName:'Katherine', lastName:'Smith', contactEmail:'info@catherinesmithonline.com', vmUserId:'12154852').save()
 			User steve = new User(userType: 'user', userName:'ksmith', firstName:'Katherine', lastName:'Smith', contactEmail:'Stephen.Perry2@virginmedia.co.uk', vmUserId:'12154854').save()
 			User ryan = new User(userType: 'user', userName:'ksmith', firstName:'Katherine', lastName:'Smith', contactEmail:'Ryan.Gilmore@virginmedia.co.uk', vmUserId:'12154855').save()
-			User energy = new User(userType: 'user', userName:'energy', firstName:'energy', lastName:'energy', contactEmail:'Ryan.Gilmore@virginmedia.co.uk', vmUserId:'12154855').save()
+			User energy = new User(userType: 'user', userName:'energy', firstName:'water', lastName:'gas', contactEmail:'Ryan.Gilmore@virginmedia.co.uk', vmUserId:'122354855').save()
 			
 			
 			

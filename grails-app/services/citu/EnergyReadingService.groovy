@@ -131,7 +131,7 @@ class EnergyReadingService {
 						
 						readings.element.each { reading ->
 							def premise = Premise.findByFlatNo(reading.name.toString())
-							//println ("premise "+premise)
+						//	println ("premise "+premise)
 							
 							if (premise){
 								if (urlEntry.category.equals("Electricity")) {
