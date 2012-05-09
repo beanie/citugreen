@@ -29,11 +29,11 @@ class HelperUtil {
 		return (!dbl) ? 0 : dbl
 	}
 	
-	static Map generateElecSummary(Double sum, Map highlows, Double avg) {
+	static Map generateElecSummary(Double sum, Map highlows, Double avg, Double est) {
 		def electricity = [:]
 		electricity.put("currentCost", BillUtil.calcElecPriceByVolume(nullCheck(sum)))
 		electricity.put("averageCost", BillUtil.calcElecPriceByVolume(nullCheck(avg)*24))
-		electricity.put("estimateCost", BillUtil.calcElecPriceByVolume(nullCheck(sum)+2))
+		electricity.put("estimateCost", BillUtil.calcElecPriceByVolume(nullCheck(est)))
 		electricity.put("swingLow", BillUtil.calcElecPriceByVolume(nullCheck(highlows?.elec?.low)))
 		electricity.put("swingHigh", BillUtil.calcElecPriceByVolume(nullCheck(highlows?.elec?.high)))
 		return electricity
