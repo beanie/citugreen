@@ -400,10 +400,10 @@ class PremiseController extends BaseController {
 		for (i in premises) {
 			def sumWater = WaterReading.executeQuery("select sum(reading.readingValueHot), sum(reading.readingValueCold), sum(reading.readingValueGrey) from WaterReading as reading where reading.premise.flatNo = "+ i +" and reading.dateCreated between:date1 AND :date2 ", [date1:startDate, date2:endDate])
 			// ignore Water for empty values
-			if (sumWater[0][1]) {
-				def tmpSum = BillUtil.calcHotWaterPriceByVolume(sumWater[0][0])+BillUtil.calcColdWaterPriceByVolume(sumWater[0][1])+BillUtil.calcGreyWaterPriceByVolume(sumWater[0][2])
+			if (sumWater[0][1]) {			
+				def tmpSum = sumWater[0][0]+sumWater[0][1]+sumWater[0][2]
 				waterReadings.add(tmpSum)
-				tmpWaterFloat = (tmpWaterFloat + tmpSum)		
+				tmpWaterFloat = (tmpWaterFloat + tmpSum)
 			}
 		}
 		log.info(tmpWaterFloat)
