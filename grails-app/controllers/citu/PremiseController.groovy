@@ -90,13 +90,11 @@ class PremiseController extends BaseController {
 			log.info("heat avg Reading : "+ avgHeat[0])
 			log.info("heat Reading : "+ sumHeat[0])
 			
-			def predictions = getDayPrediction(premise.flatNo)
-			
-			premise.put("electricity", HelperUtil.generateElecSummary(sumElec[0], highlows, avgElec[0], predictions.elecEstimate))
-			premise.put("heat", HelperUtil.generateHeatSummary(sumHeat[0], highlows, avgHeat[0]))
-			premise.put("hotWater", HelperUtil.generateHotWaterSummary(sumWater[0][0], highlows, avgWater[0][0]))
-			premise.put("coldWater", HelperUtil.generateColdWaterSummary(sumWater[0][1], highlows, avgWater[0][1]))
-			premise.put("greyWater", HelperUtil.generateGreyWaterSummary(sumWater[0][2], highlows, avgWater[0][2]))
+			premise.put("electricity", HelperUtil.generateElecSummary(sumElec[0], highlows, avgElec[0], getDayPrediction(premise.flatNo, "elec")))
+			premise.put("heat", HelperUtil.generateHeatSummary(sumHeat[0], highlows, avgHeat[0], getDayPrediction(premise.flatNo, "heat")))
+			premise.put("hotWater", HelperUtil.generateHotWaterSummary(sumWater[0][0], highlows, avgWater[0][0], getDayPrediction(premise.flatNo, "hotWater")))
+			premise.put("coldWater", HelperUtil.generateColdWaterSummary(sumWater[0][1], highlows, avgWater[0][1], getDayPrediction(premise.flatNo, "coldWater")))
+			premise.put("greyWater", HelperUtil.generateGreyWaterSummary(sumWater[0][2], highlows, avgWater[0][2], getDayPrediction(premise.flatNo, "greyWater")))
 			
 			render premise as JSON
 		}
@@ -455,9 +453,7 @@ class PremiseController extends BaseController {
 		return readings
 	}
 	
-	Map getDayPrediction(String flatNo) {
-		
-		def flatForecast = [:]
+	Float getDayPrediction(String flatNo, String estType) {
 		
 		// get 2 days previous data
 		def now = new DateTime()
@@ -470,37 +466,62 @@ class PremiseController extends BaseController {
 		
 		log.info("Last Week : "+ lastWeek +" to "+ lastWeek.plusDays(1).minusSeconds(1))
 		
-		def elecDataSet = new DataSet()
+		def predDataSet = new DataSet()
 		
-		def sum2WeeksPrev = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ flatNo +" and reading.fileDate between:date1 AND :date2 ", [date1:lastWeek.toDate(), date2:lastWeek.plusDays(1).minusSeconds(1).toDate()])
-		def sumWeekPrev = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ flatNo +" and reading.fileDate between:date1 AND :date2 ", [date1:lastWeek.minusWeeks(1).toDate(), date2:lastWeek.minusWeeks(1).plusDays(1).minusSeconds(1).toDate()])
-		def sum2DaysPrev = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ flatNo +" and reading.fileDate between:date1 AND :date2 ", [date1:yesterday.minusDays(1).toDate(), date2:yesterday.minusSeconds(1).toDate()])
-		def sumDayPrev = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ flatNo +" and reading.fileDate between:date1 AND :date2 ", [date1:yesterday.toDate(), date2:yesterday.plusDays(1).minusSeconds(1).toDate()])
+		def sum2WeeksPrev
+		def sumWeekPrev
+		def sum2DaysPrev
+		def sumDayPrev
 		
-		log.info("Sum - "+ sum2WeeksPrev[0])
+		if (estType.equals("elec")) {
+			sum2WeeksPrev = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ flatNo +" and reading.dateCreated between:date1 AND :date2 ", [date1:lastWeek.toDate(), date2:lastWeek.plusDays(1).minusSeconds(1).toDate()])
+			sumWeekPrev = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ flatNo +" and reading.dateCreated between:date1 AND :date2 ", [date1:lastWeek.minusWeeks(1).toDate(), date2:lastWeek.minusWeeks(1).plusDays(1).minusSeconds(1).toDate()])
+			sum2DaysPrev = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ flatNo +" and reading.dateCreated between:date1 AND :date2 ", [date1:yesterday.minusDays(1).toDate(), date2:yesterday.minusSeconds(1).toDate()])
+			sumDayPrev = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ flatNo +" and reading.dateCreated between:date1 AND :date2 ", [date1:yesterday.toDate(), date2:yesterday.plusDays(1).minusSeconds(1).toDate()])
+		} else if (estType.equals("heat")) {
+			sum2WeeksPrev = HeatReading.executeQuery("select sum(reading.readingValueHeat) from HeatReading as reading where reading.premise.flatNo = "+ flatNo +" and reading.fileDate between:date1 AND :date2 ", [date1:lastWeek.toDate(), date2:lastWeek.plusDays(1).minusSeconds(1).toDate()])
+			sumWeekPrev = HeatReading.executeQuery("select sum(reading.readingValueHeat) from HeatReading as reading where reading.premise.flatNo = "+ flatNo +" and reading.fileDate between:date1 AND :date2 ", [date1:lastWeek.minusWeeks(1).toDate(), date2:lastWeek.minusWeeks(1).plusDays(1).minusSeconds(1).toDate()])
+			sum2DaysPrev = HeatReading.executeQuery("select sum(reading.readingValueHeat) from HeatReading as reading where reading.premise.flatNo = "+ flatNo +" and reading.fileDate between:date1 AND :date2 ", [date1:yesterday.minusDays(1).toDate(), date2:yesterday.minusSeconds(1).toDate()])
+			sumDayPrev = HeatReading.executeQuery("select sum(reading.readingValueHeat) from HeatReading as reading where reading.premise.flatNo = "+ flatNo +" and reading.fileDate between:date1 AND :date2 ", [date1:yesterday.toDate(), date2:yesterday.plusDays(1).minusSeconds(1).toDate()])
+		} else if (estType.equals("hotWater")) {
+			sum2WeeksPrev = WaterReading.executeQuery("select sum(reading.readingValueHot) from WaterReading as reading where reading.premise.flatNo = "+ flatNo +" and reading.dateCreated between:date1 AND :date2 ", [date1:lastWeek.toDate(), date2:lastWeek.plusDays(1).minusSeconds(1).toDate()])
+			sumWeekPrev = WaterReading.executeQuery("select sum(reading.readingValueHot) from WaterReading as reading where reading.premise.flatNo = "+ flatNo +" and reading.dateCreated between:date1 AND :date2 ", [date1:lastWeek.minusWeeks(1).toDate(), date2:lastWeek.minusWeeks(1).plusDays(1).minusSeconds(1).toDate()])
+			sum2DaysPrev = WaterReading.executeQuery("select sum(reading.readingValueHot) from WaterReading as reading where reading.premise.flatNo = "+ flatNo +" and reading.dateCreated between:date1 AND :date2 ", [date1:yesterday.minusDays(1).toDate(), date2:yesterday.minusSeconds(1).toDate()])
+			sumDayPrev = WaterReading.executeQuery("select sum(reading.readingValueHot) from WaterReading as reading where reading.premise.flatNo = "+ flatNo +" and reading.dateCreated between:date1 AND :date2 ", [date1:yesterday.toDate(), date2:yesterday.plusDays(1).minusSeconds(1).toDate()])
+		} else if (estType.equals("coldWater")) {
+			sum2WeeksPrev = WaterReading.executeQuery("select sum(reading.readingValueCold) from WaterReading as reading where reading.premise.flatNo = "+ flatNo +" and reading.dateCreated between:date1 AND :date2 ", [date1:lastWeek.toDate(), date2:lastWeek.plusDays(1).minusSeconds(1).toDate()])
+			sumWeekPrev = WaterReading.executeQuery("select sum(reading.readingValueCold) from WaterReading as reading where reading.premise.flatNo = "+ flatNo +" and reading.dateCreated between:date1 AND :date2 ", [date1:lastWeek.minusWeeks(1).toDate(), date2:lastWeek.minusWeeks(1).plusDays(1).minusSeconds(1).toDate()])
+			sum2DaysPrev = WaterReading.executeQuery("select sum(reading.readingValueCold) from WaterReading as reading where reading.premise.flatNo = "+ flatNo +" and reading.dateCreated between:date1 AND :date2 ", [date1:yesterday.minusDays(1).toDate(), date2:yesterday.minusSeconds(1).toDate()])
+			sumDayPrev = WaterReading.executeQuery("select sum(reading.readingValueCold) from WaterReading as reading where reading.premise.flatNo = "+ flatNo +" and reading.dateCreated between:date1 AND :date2 ", [date1:yesterday.toDate(), date2:yesterday.plusDays(1).minusSeconds(1).toDate()])
+		} else if (estType.equals("greyWater")) {
+			sum2WeeksPrev = WaterReading.executeQuery("select sum(reading.readingValueGrey) from WaterReading as reading where reading.premise.flatNo = "+ flatNo +" and reading.dateCreated between:date1 AND :date2 ", [date1:lastWeek.toDate(), date2:lastWeek.plusDays(1).minusSeconds(1).toDate()])
+			sumWeekPrev = WaterReading.executeQuery("select sum(reading.readingValueGrey) from WaterReading as reading where reading.premise.flatNo = "+ flatNo +" and reading.dateCreated between:date1 AND :date2 ", [date1:lastWeek.minusWeeks(1).toDate(), date2:lastWeek.minusWeeks(1).plusDays(1).minusSeconds(1).toDate()])
+			sum2DaysPrev = WaterReading.executeQuery("select sum(reading.readingValueGrey) from WaterReading as reading where reading.premise.flatNo = "+ flatNo +" and reading.dateCreated between:date1 AND :date2 ", [date1:yesterday.minusDays(1).toDate(), date2:yesterday.minusSeconds(1).toDate()])
+			sumDayPrev = WaterReading.executeQuery("select sum(reading.readingValueGrey) from WaterReading as reading where reading.premise.flatNo = "+ flatNo +" and reading.dateCreated between:date1 AND :date2 ", [date1:yesterday.toDate(), date2:yesterday.plusDays(1).minusSeconds(1).toDate()])
+		}
 		
 		if (sum2WeeksPrev[0]) {
-			Observation elecObservation = new Observation(sum2WeeksPrev[0])
-			elecObservation.setIndependentValue("date", 1)
-			elecDataSet.add(elecObservation)
+			Observation observation = new Observation(sum2WeeksPrev[0])
+			observation.setIndependentValue("date", 1)
+			predDataSet.add(observation)
 		}
 		
 		if (sumWeekPrev[0]) {
-			Observation elecObservation1 = new Observation(sumWeekPrev[0])
-			elecObservation1.setIndependentValue("date", 2)
-			elecDataSet.add(elecObservation1)
+			Observation observation1 = new Observation(sumWeekPrev[0])
+			observation1.setIndependentValue("date", 2)
+			predDataSet.add(observation1)
 		}
 		
 		if (sum2DaysPrev[0]) {
-			Observation elecObservation2 = new Observation(sum2DaysPrev[0])
-			elecObservation2.setIndependentValue("date", 3)
-			elecDataSet.add(elecObservation2)
+			Observation observation2 = new Observation(sum2DaysPrev[0])
+			observation2.setIndependentValue("date", 3)
+			predDataSet.add(observation2)
 		}
 		
 		if (sumDayPrev[0]) {
 			Observation elecObservation3 = new Observation(sumDayPrev[0])
-			elecObservation3.setIndependentValue("date", 4)
-			elecDataSet.add(elecObservation3)
+			observation3.setIndependentValue("date", 4)
+			predDataSet.add(observation3)
 		}
 		
 		/*
@@ -512,9 +533,9 @@ class PremiseController extends BaseController {
 		//observation1.setIndependentValue("month", 12)
 		//observation1.setIndependentValue("date", 20)
 		
-		if (elecDataSet) {
-			ForecastingModel model = Forecaster.getBestForecast(elecDataSet)
-			model.init(elecDataSet)
+		if (predDataSet) {
+			ForecastingModel model = Forecaster.getBestForecast(predDataSet)
+			model.init(predDataSet)
 			
 			DataPoint fcDataPoint4 = new Observation(0.0)
 			fcDataPoint4.setIndependentValue("date", 5)
@@ -532,16 +553,12 @@ class PremiseController extends BaseController {
 			}
 			
 			model.forecast(fcDataPoint4)
-			log.debug("estimated elec value:")
+			log.debug("estimated value:")
 			log.debug(fcDataPoint4.getDependentValue())
-			flatForecast.put("elecEstimate", fcDataPoint4.getDependentValue())
+			return fcDataPoint4.getDependentValue()
 		} else {
-			flatForecast.put("elecEstimate", new Float(0))
-			flatForecast.put("heatEstimate", new Float(0))
+			return new Float(0)
 		}
-		
-		log.info(flatForecast)
-		return flatForecast
 		
 	}
 
