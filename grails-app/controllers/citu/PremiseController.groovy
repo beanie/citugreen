@@ -548,7 +548,7 @@ class PremiseController extends BaseController {
 		}
 		
 		if (sumDayPrev[0]) {
-			Observation elecObservation3 = new Observation(sumDayPrev[0])
+			Observation observation3 = new Observation(sumDayPrev[0])
 			observation3.setIndependentValue("date", 4)
 			predDataSet.add(observation3)
 		}
