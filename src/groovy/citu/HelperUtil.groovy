@@ -119,9 +119,7 @@ class HelperUtil {
 		ArrayList waterReadings = new ArrayList()
 		premiseInstance.waterReadings.each { reading ->
 			waterReadings.add([readingValueHot:reading.readingValueHot, readingValueCold:reading.readingValueCold, readingValueGrey:reading.readingValueGrey, dateTime:reading.dateCreated])
-		}
-		
-		
+		}	
 		
 		premise.put("readings", waterReadings)
 		premise.put("waterTotalUsageHot", BillUtil.calcTotal(premiseInstance.waterReadings.readingValueHot))
