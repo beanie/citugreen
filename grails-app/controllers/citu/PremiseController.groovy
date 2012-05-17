@@ -15,10 +15,6 @@ class PremiseController extends BaseController {
 	def beforeInterceptor = [action:this.&auth, except:["getReadingsByDate", "getReadingsSummary", "forecast"]]
 
 	def scaffold = true
-	
-	def forecast = {
-		getPredictedPrice()
-	}
 
 	def summary = {
 
@@ -562,7 +558,9 @@ class PremiseController extends BaseController {
 		//observation1.setIndependentValue("month", 12)
 		//observation1.setIndependentValue("date", 20)
 		
-		if (predDataSet) {
+		log.info(estType+" : "+ predDataSet.size())
+		
+		if (predDataSet.size() > 1) {
 			ForecastingModel model = Forecaster.getBestForecast(predDataSet)
 			model.init(predDataSet)
 			
