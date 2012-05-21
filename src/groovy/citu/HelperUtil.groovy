@@ -39,6 +39,14 @@ class HelperUtil {
 		return electricity
 	}
 	
+	static Map generateElecSummary(Double sum, Double avg) {
+		def electricity = [:]
+		electricity.put("currentCost", BillUtil.calcElecPriceByVolume(nullCheck(sum)))
+		electricity.put("averageCost", BillUtil.calcElecPriceByVolume(nullCheck(avg)*24))
+		return electricity
+	}
+	
+	
 	static Map generateHeatSummary(Double sum, Map highlows, Double avg, Double est) {
 		def heat = [:]
 		heat.put("currentCost", BillUtil.calcHeatPriceByVolume(nullCheck(sum)))
@@ -46,6 +54,13 @@ class HelperUtil {
 		heat.put("estimateCost", BillUtil.calcHeatPriceByVolume(nullCheck(est)))
 		heat.put("swingLow", BillUtil.calcHeatPriceByVolume(nullCheck(highlows?.heat?.low)))
 		heat.put("swingHigh", BillUtil.calcHeatPriceByVolume(nullCheck(highlows?.heat?.high)))
+		return heat
+	}
+	
+	static Map generateHeatSummary(Double sum, Double avg) {
+		def heat = [:]
+		heat.put("currentCost", BillUtil.calcHeatPriceByVolume(nullCheck(sum)))
+		heat.put("averageCost", BillUtil.calcHeatPriceByVolume(nullCheck(avg)*24))
 		return heat
 	}
 
@@ -60,6 +75,13 @@ class HelperUtil {
 		return coldWater
 	}
 	
+	static Map generateColdWaterSummary(Double sum, Double avg) {
+		def coldWater = [:]
+		coldWater.put("currentCost", BillUtil.calcColdWaterPriceByVolume(nullCheck(sum)))
+		coldWater.put("averageCost", BillUtil.calcColdWaterPriceByVolume(nullCheck(avg)*24))
+		return coldWater
+	}
+	
 	static Map generateHotWaterSummary(Double sum, Map highlows, Double avg, Double est) {
 		def hotWater = [:]		
 		hotWater.put("currentCost", BillUtil.calcHotWaterPriceByVolume(nullCheck(sum)))
@@ -67,6 +89,14 @@ class HelperUtil {
 		hotWater.put("estimateCost", BillUtil.calcHotWaterPriceByVolume(nullCheck(est)))
 		hotWater.put("swingLow", BillUtil.calcHotWaterPriceByVolume(nullCheck(highlows?.hotWater?.low)))
 		hotWater.put("swingHigh", BillUtil.calcHotWaterPriceByVolume(nullCheck(highlows?.hotWater?.high)))
+		return hotWater
+	}
+	
+	
+	static Map generateHotWaterSummary(Double sum, Double avg) {
+		def hotWater = [:]
+		hotWater.put("currentCost", BillUtil.calcHotWaterPriceByVolume(nullCheck(sum)))
+		hotWater.put("averageCost", BillUtil.calcHotWaterPriceByVolume(nullCheck(avg)*24))
 		return hotWater
 	}
 	
@@ -79,6 +109,17 @@ class HelperUtil {
 		greyWater.put("swingHigh", BillUtil.calcGreyWaterPriceByVolume(nullCheck(highlows?.greyWater?.high)))
 		return greyWater
 	}
+	
+	static Map generateGreyWaterSummary(Double sum, Double avg) {
+		def greyWater = [:]
+		greyWater.put("currentCost", BillUtil.calcGreyWaterPriceByVolume(nullCheck(sum)))
+		greyWater.put("averageCost", BillUtil.calcGreyWaterPriceByVolume(nullCheck(avg)*24))
+		return greyWater
+	}
+	
+	
+	
+	
 	
 	static Map createElectricityMap(Premise premiseInstance, Map premise, Map swingData) {
 		ArrayList electricityReadings = new ArrayList()

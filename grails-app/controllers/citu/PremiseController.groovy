@@ -12,7 +12,7 @@ import grails.converters.*
 
 class PremiseController extends BaseController {
 
-	def beforeInterceptor = [action:this.&auth, except:["getReadingsByDate", "getReadingsSummary", "forecast"]]
+	def beforeInterceptor = [action:this.&auth, except:["getReadingsByDate","getBuildingReadingsSummary", "getReadingsSummary", "forecast"]]
 
 	def scaffold = true
 
@@ -48,17 +48,21 @@ class PremiseController extends BaseController {
 	
 	def getBuildingReadingsSummary = {
 		
+			def Premise premiseInstance = HelperUtil.getPremise(params)
+			def premise = HelperUtil.createPremiseSkeletonMap(premiseInstance)
+			
+			
 			def now = new DateTime()
 			now = new DateTime(now.getYear(), now.getMonthOfYear(), now.getDayOfMonth(), 0, 0, 0, 0)
-			def endOfDay = now.plusDays(1).minusSeconds(1)
+		//	def endOfDay = now.plusDays(1).minusSeconds(1)
+	//		def premise = new Premise(bathrooms:1, premiseType:'Flat', core:'None', bedrooms:1, squareArea:40, flatNo:'overAll', addressLine1:'Sonic House', addressLine2:'CituGreen Est.', postCode:'SW5 3AP')
 			
 			/*
 			 * Pull back the sums for the summary
 			 */
-			def sumElec = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.dateCreated between:date1 AND :date2 ", [date1:now.toDate(), date2:endOfDay.toDate()])
-			def sumWater = WaterReading.executeQuery("select sum(reading.readingValueHot), sum(reading.readingValueCold), sum(reading.readingValueGrey) from WaterReading as reading where reading.dateCreated between:date1 AND :date2 ", [date1:now.toDate(), date2:endOfDay.toDate()])
-			def sumHeat = HeatReading.executeQuery("select sum(reading.readingValueHeat) from HeatReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.toDate(), date2:endOfDay.toDate()])
-			def sumEnergyIn = WaterReading.executeQuery("select sum(reading.")
+			def sumElec = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.dateCreated between:date1 AND :date2 ", [date1:now.toDate()-7, date2:now.toDate()])
+			def sumWater = WaterReading.executeQuery("select sum(reading.readingValueHot), sum(reading.readingValueCold), sum(reading.readingValueGrey) from WaterReading as reading where reading.dateCreated between:date1 AND :date2 ", [date1:now.toDate()-7, date2:now.toDate()])
+			def sumHeat = HeatReading.executeQuery("select sum(reading.readingValueHeat) from HeatReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.toDate()-7, date2:now.toDate()])
 	
 			/*
 			 * Pull back the avg for the summary from today minus 7 days
@@ -66,9 +70,16 @@ class PremiseController extends BaseController {
 			def avgElec = ElecReading.executeQuery("select avg(reading.readingValueElec) from ElecReading as reading where reading.dateCreated between:date1 AND :date2 ", [date1:now.toDate()-7, date2:now.toDate()])
 			def avgWater = WaterReading.executeQuery("select avg(reading.readingValueHot), avg(reading.readingValueCold), avg(reading.readingValueGrey) from WaterReading as reading where reading.dateCreated between:date1 AND :date2 ", [date1:now.toDate()-7, date2:now.toDate()])
 			def avgHeat = HeatReading.executeQuery("select avg(reading.readingValueHeat) from HeatReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.toDate()-7, date2:now.toDate()])
-
+			
+			
+			premise.put("electricity", HelperUtil.generateElecSummary(sumElec[0], avgElec[0]))
+			premise.put("heat", HelperUtil.generateHeatSummary(sumHeat[0], avgHeat[0]))
+					
+			premise.put("hotWater", HelperUtil.generateHotWaterSummary(sumWater[0][0], avgWater[0][0]))	
+			premise.put("coldWater", HelperUtil.generateColdWaterSummary(sumWater[0][1], avgWater[0][1]))
+			premise.put("greyWater", HelperUtil.generateGreyWaterSummary(sumWater[0][2], avgWater[0][2]))
 		
-		//	render premise as JSON
+			render premise as JSON
 		}
 
 	
