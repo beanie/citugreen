@@ -12,9 +12,15 @@ import grails.converters.*
 
 class PremiseController extends BaseController {
 
-	def beforeInterceptor = [action:this.&auth, except:["getReadingsByDate","getBuildingReadingsSummary", "getReadingsSummary", "forecast"]]
+	RankService rankService
+	
+	def beforeInterceptor = [action:this.&auth, except:["getReadingsByDate","getBuildingReadingsSummary", "getReadingsSummary", "ben", "forecast"]]
 
 	def scaffold = true
+	
+	def ben = {
+		rankService.generateRankings()
+	}
 
 	def summary = {
 
@@ -54,8 +60,8 @@ class PremiseController extends BaseController {
 			
 			def now = new DateTime()
 			now = new DateTime(now.getYear(), now.getMonthOfYear(), now.getDayOfMonth(), 0, 0, 0, 0)
-		//	def endOfDay = now.plusDays(1).minusSeconds(1)
-	//		def premise = new Premise(bathrooms:1, premiseType:'Flat', core:'None', bedrooms:1, squareArea:40, flatNo:'overAll', addressLine1:'Sonic House', addressLine2:'CituGreen Est.', postCode:'SW5 3AP')
+			//	def endOfDay = now.plusDays(1).minusSeconds(1)
+			//	def premise = new Premise(bathrooms:1, premiseType:'Flat', core:'None', bedrooms:1, squareArea:40, flatNo:'overAll', addressLine1:'Sonic House', addressLine2:'CituGreen Est.', postCode:'SW5 3AP')
 			
 			/*
 			 * Pull back the sums for the summary
@@ -219,9 +225,6 @@ class PremiseController extends BaseController {
 				swingData = getHeatSwingometer(premiseInstance.bedrooms, now.toDate(), endOfDay.toDate())
 				if (premiseInstance.heatReadings.size() > 0) {
 					HelperUtil.createHeatMap(premiseInstance, premise, swingData)
-					
-					
-
 				} else {
 					premise = ["312":"No Heat Data for specified period"]
 				}
@@ -571,10 +574,11 @@ class PremiseController extends BaseController {
 		
 		log.info(estType+" : "+ predDataSet.size())
 		
-		if (predDataSet.size() > 1) {
+		if (predDataSet.size() > 3) {
 			ForecastingModel model = Forecaster.getBestForecast(predDataSet)
+			log.info("going to init")
 			model.init(predDataSet)
-			
+			log.info("init ok")
 			DataPoint fcDataPoint4 = new Observation(0.0)
 			fcDataPoint4.setIndependentValue("date", 5)
 			
@@ -584,6 +588,7 @@ class PremiseController extends BaseController {
 			
 			Iterator itt = fcDataSet.iterator();
 			Double value=0.0;
+			log.info("going to itt....")
 			while (itt.hasNext()) {
 				DataPoint dp = (DataPoint) itt.next();
 				double forecastValue = dp.getDependentValue();
@@ -591,7 +596,7 @@ class PremiseController extends BaseController {
 			}
 			
 			model.forecast(fcDataPoint4)
-			log.debug("estimated value:")
+			log.info("estimated value:")
 			log.debug(fcDataPoint4.getDependentValue())
 			return fcDataPoint4.getDependentValue()
 		} else {
