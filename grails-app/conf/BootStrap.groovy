@@ -204,7 +204,7 @@ class BootStrap {
 			Premise Flat621 = new Premise(bathrooms:1, premiseType:'Flat', core:'None', bedrooms:1, squareArea:58,flatNo:'621', addressLine1:'Beanie House', addressLine2:'CituGreen Est.', postCode:'SW5 3AP', user:neil).save()
 			Premise Flat622 = new Premise(bathrooms:1, premiseType:'Flat', core:'None', bedrooms:2, squareArea:58,flatNo:'622', addressLine1:'Beanie House', addressLine2:'CituGreen Est.', postCode:'SW5 3AP', user:neil).save()
 			Premise Flat623 = new Premise(bathrooms:1, premiseType:'Flat', core:'None', bedrooms:1, squareArea:58,flatNo:'623', addressLine1:'Beanie House', addressLine2:'CituGreen Est.', postCode:'SW5 3AP', user:neil).save()
-			Premise Flat999 = new Premise(bathrooms:1, premiseType:'Flat', core:'None', bedrooms:1, squareArea:58,flatNo:'overAll', addressLine1:'Overall', addressLine2:'Overall', postCode:'SW5 3AP', user:neil).save()
+			Premise Flat999 = new Premise(bathrooms:1, premiseType:'Flat', core:'None', bedrooms:7, squareArea:58,flatNo:'overAll', addressLine1:'Overall', addressLine2:'Overall', postCode:'SW5 3AP', user:neil).save()
 			
 			
 			
