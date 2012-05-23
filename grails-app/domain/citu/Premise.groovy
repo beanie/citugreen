@@ -2,8 +2,7 @@ package citu
 
 class Premise {
 
-    // TODO extend a premise to flat / office etc.
-	String flatNo
+    String flatNo
 	String addressLine1
 	String addressLine2
 	String postCode
@@ -12,6 +11,10 @@ class Premise {
 	int bedrooms
 	int bathrooms
 	int squareArea
+	
+	Float rank
+	Float prevWeekRank
+	Float rankValue
 	
 	boolean occupied
 
@@ -30,6 +33,9 @@ class Premise {
     static constraints = {
 		addressLine1(blank:false, nullable: false)
 		addressLine2(blank:false, nullable: false)
+		rank(blank:true, nullable: true)
+		prevWeekRank(blank:true, nullable: true)
+		rankValue(blank:true, nullable: true)
     }
 
 	static transients = ['elecReadings', 'waterReadings', 'heatReadings']

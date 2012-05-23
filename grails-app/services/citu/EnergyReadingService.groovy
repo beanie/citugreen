@@ -14,31 +14,6 @@ class EnergyReadingService {
 	
 	static transactional = true
 	
-	def frig() {
-	
-		def now = new Date()
-		
-	//	Premise p = Premise.findByFlatNo("5")
-		//Premise p1 = Premise.findByFlatNo("606")
-		//Premise p2 = Premise.findByFlatNo("106")
-		//Premise p3 = Premise.findByFlatNo("608")
-		//Premise p4 = Premise.findByFlatNo("610")
-	
-		def random = new Random()
-	
-		//ElecReading tmpReading = new ElecReading(readingValueElec:random.nextInt(8), dateCreated:now, premise:p1).save()
-		//ElecReading tmpReading1 = new ElecReading(readingValueElec:random.nextInt(8), dateCreated:now, premise:p2).save()
-	//	ElecReading tmpReading2 = new ElecReading(readingValueElec:random.nextInt(8), dateCreated:now, premise:p).save()
-		//ElecReading tmpReading3 = new ElecReading(readingValueElec:random.nextInt(8), dateCreated:now, premise:p3).save()
-		//ElecReading tmpReading4 = new ElecReading(readingValueElec:random.nextInt(8), dateCreated:now, premise:p4).save()
-		//WaterReading tmpWater = new WaterReading(dateCreated:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p1).save()
-		//WaterReading tmpWater1 = new WaterReading(dateCreated:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p2).save()
-		//WaterReading tmpWater2 = new WaterReading(dateCreated:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p3).save()
-		//WaterReading tmpWater3 = new WaterReading(dateCreated:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p4).save()
-	//	WaterReading tmpWater4 = new WaterReading(dateCreated:now, readingValueCold:random.nextInt(30), readingValueHot:random.nextInt(30) + 2, readingValueGrey:random.nextInt(30) + 1, premise:p).save()
-
-	}
-	
 	def processElec() {
 		def elecUrls = EnergyFileRef.findAllByCategory('Electricity')
 		processXml(elecUrls)
@@ -50,9 +25,6 @@ class EnergyReadingService {
 		processXml(waterUrls)
 		log.info ("Processing Water")
 	}
-	
-	
-		
 	
 	def processHeat() {
 		def f = new File("c:\\files\\")
