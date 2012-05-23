@@ -12,8 +12,8 @@ class Premise {
 	int bathrooms
 	int squareArea
 	
-	Float rank
-	Float prevWeekRank
+	String rank
+	String prevWeekRank
 	Float rankValue
 	
 	boolean occupied

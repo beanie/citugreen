@@ -40,7 +40,7 @@ class RankService {
 		def x = 0
 		for (i in premises) {
 			x ++
-			i.rank = x
+			i.rank = x +" of "+ premises.size()
 			i.save()
 		}
 		
