@@ -64,19 +64,17 @@ class PremiseController extends BaseController {
 
 		def now = new DateTime()
 		now = new DateTime(now.getYear(), now.getMonthOfYear(), now.getDayOfMonth(), 0, 0, 0, 0)
-		//	def endOfDay = now.plusDays(1).minusSeconds(1)
-		//	def premise = new Premise(bathrooms:1, premiseType:'Flat', core:'None', bedrooms:1, squareArea:40, flatNo:'overAll', addressLine1:'Sonic House', addressLine2:'CituGreen Est.', postCode:'SW5 3AP')
 
 		/*
 		 * Pull back the sums for the summary
 		 */
-		def sumElec = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.toDate()-7, date2:now.toDate()])
-		def sumWater = WaterReading.executeQuery("select sum(reading.readingValueHot), sum(reading.readingValueCold), sum(reading.readingValueGrey) from WaterReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.toDate()-7, date2:now.toDate()])
-		def sumHeat = HeatReading.executeQuery("select sum(reading.readingValueHeat) from HeatReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.toDate()-7, date2:now.toDate()])
+		def sumElec = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(7).toDate(), date2:now.toDate()])
+		def sumWater = WaterReading.executeQuery("select sum(reading.readingValueHot), sum(reading.readingValueCold), sum(reading.readingValueGrey) from WaterReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(7).toDate(), date2:now.toDate()])
+		def sumHeat = HeatReading.executeQuery("select sum(reading.readingValueHeat) from HeatReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(7).toDate(), date2:now.toDate()])
 
-		def sumElecLW = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.toDate()-14, date2:now.toDate()-7])
-		def sumWaterLW = WaterReading.executeQuery("select sum(reading.readingValueHot), sum(reading.readingValueCold), sum(reading.readingValueGrey) from WaterReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.toDate()-14, date2:now.toDate()-7])
-		def sumHeatLW = HeatReading.executeQuery("select sum(reading.readingValueHeat) from HeatReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.toDate()-14, date2:now.toDate()-7])
+		def sumElecLW = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(14).toDate(), date2:now.minusDays(7).toDate()])
+		def sumWaterLW = WaterReading.executeQuery("select sum(reading.readingValueHot), sum(reading.readingValueCold), sum(reading.readingValueGrey) from WaterReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(14).toDate(), date2:now.minusDays(7).toDate()])
+		def sumHeatLW = HeatReading.executeQuery("select sum(reading.readingValueHeat) from HeatReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(14).toDate(), date2:now.minusDays(7).toDate()])
 
 
 		Float tmp = new Float(0.15)
@@ -147,8 +145,8 @@ class PremiseController extends BaseController {
 			/*
 			 * Pull back the avg for the summary from today minus 7 days
 			 */
-			def avgElec = ElecReading.executeQuery("select avg(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ premiseInstance.flatNo +" and reading.dateCreated between:date1 AND :date2 ", [date1:now.toDate()-7, date2:now.toDate()])
-			def avgWater = WaterReading.executeQuery("select avg(reading.readingValueHot), avg(reading.readingValueCold), avg(reading.readingValueGrey) from WaterReading as reading where reading.premise.flatNo = "+ premiseInstance.flatNo +" and reading.dateCreated between:date1 AND :date2 ", [date1:now.toDate()-7, date2:now.toDate()])
+			def avgElec = ElecReading.executeQuery("select avg(reading.readingValueElec) from ElecReading as reading where reading.premise.flatNo = "+ premiseInstance.flatNo +" and reading.dateCreated between:date1 AND :date2 ", [date1:now.minusDays(7).toDate(), date2:now.toDate()])
+			def avgWater = WaterReading.executeQuery("select avg(reading.readingValueHot), avg(reading.readingValueCold), avg(reading.readingValueGrey) from WaterReading as reading where reading.premise.flatNo = "+ premiseInstance.flatNo +" and reading.dateCreated between:date1 AND :date2 ", [date1:now.minusDays(7).toDate(), date2:now.toDate()])
 			def avgHeat = HeatReading.executeQuery("select avg(reading.readingValueHeat) from HeatReading as reading where reading.premise.flatNo = "+ premiseInstance.flatNo +" and reading.fileDate between:date1 AND :date2 ", [date1:now.toDate()-8, date2:now.minusDays(1).toDate()])
 
 
