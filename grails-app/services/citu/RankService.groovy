@@ -8,19 +8,6 @@ class RankService {
 
     def generateRankings() {	
 		
-		processRanking()
-		
-		// if its the last day of the week, archive them
-		if (now.dayOfWeek().getAsShortText().equals('Sun')) {
-			for (i in premises) {
-				i.prevWeekRank = rank
-				i.save()
-			}
-		}
-		
-    }
-	
-	def processRanking() {
 		// get all the occupied properites
 		def premises = Premise.findAllByOccupied(true)
 		log.info("Occupied Properties: "+ premises.size())
@@ -44,7 +31,7 @@ class RankService {
 			if (sumWater[0][1]) sum = sum + sumWater[0][1].toFloat()
 			if (sumWater[0][2]) sum = sum + sumWater[0][2].toFloat()
 			
-			i.rankValue = sum
+			i.rankValue = sum / i.bedrooms
 			i.save()
 		}
 		
@@ -56,6 +43,15 @@ class RankService {
 			i.rank = x
 			i.save()
 		}
-	}
+		
+		// if its the last day of the week, archive them
+		if (now.dayOfWeek().getAsShortText().equals('Sun')) {
+			for (i in premises) {
+				i.prevWeekRank = rank
+				i.save()
+			}
+		}
+		
+    }
 	
 }
