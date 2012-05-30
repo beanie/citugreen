@@ -9,7 +9,7 @@ class EnergyReading {
 	Float readingValueIn
 	Float realReadingIn
 	
-	static belongsTo = [energyitem:EnergyItem]
+	static belongsTo = [energyItem:EnergyItem]
 	
 
     static constraints = {

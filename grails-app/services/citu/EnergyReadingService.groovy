@@ -8,6 +8,7 @@ import static groovyx.net.http.ContentType.TEXT;
 import static groovyx.net.http.ContentType.XML;
 import groovy.util.XmlSlurper;
 import java.text.*;
+import java.util.Date;
 
 
 class EnergyReadingService {
@@ -66,7 +67,7 @@ class EnergyReadingService {
 												
 							//	log.info ("premise found")
 							} else {
-								log.warn("Premise not found: "+ fields[0])
+								log.info("Premise not found: "+ fields[0])
 							}
 						}
 						file.renameTo(new File("c:\\files\\processed", file.name))
@@ -159,7 +160,7 @@ class EnergyReadingService {
 									}
 							} else {
 							
-								log.warn("Premise not found: "+ reading.name.toString())
+								log.info("Premise not found: "+ reading.name.toString())
 							}
 						}
 						log.info("Processed XML file : "+ urlEntry.urlPath)
@@ -200,32 +201,33 @@ class EnergyReadingService {
 					def tmpFileDate = df.parse(fileInfo.creationdate.toString())
 					
 					readings.element.each { reading ->
-						def s = reading.name.toString()
-						def tmpS = s.replaceAll(" ", "")
-						def gene = EnergyItem.findByCollector(tmpS)
-					
-				//		def gene = reading.name.toString()
-							
-						log.info ("item " + s)
-						log.info ("item removed " + tmpS)
-						log.info ("item recovered " + gene)
+						def name = reading.name.toString()
+						def escapedName = name.replaceAll(" ", "")
+						def energyItem = EnergyItem.findByCollector(escapedName)
 						
-						if (gene){
-							log.info ("in here  ")
+						if (energyItem) {
+							
+							log.info ("Processing energyIn element : "+ name)
 							
 							if (urlEntry.category.equals("energyIn")) {
-								ArrayList tmp = EnergyReading.findAll(gene)
-								log.info("TEMP SIZE"+ tmp.size())
+								
+								ArrayList tmp = EnergyReading.findAllByEnergyItem(energyItem)
+								
+								def last
 								if (tmp) {
-									
-									reading = reading.item.rawvalue.toInteger()
-									log.info ("reading" + reading)
-					
-									}
-								def tmpReading = new EnergyReading(readingValueIn:reading, fileDate:tmpFileDate, collector:gene).save()
+									last = tmp.last().realReadingIn
+								} else {
+									last = 0
+								}
+								
+								def realValue = (reading.item.rawvalue.toInteger()- last)
+								def readingValue = reading.item.rawvalue.toInteger()
+								
+								def tmpReading = new EnergyReading(fileDate:tmpFileDate, readingValueIn:readingValue, realReadingIn:realValue, energyItem:energyItem).save()
+
 							}
 						} else {
-							log.warn("Premise not found: "+ reading.name.toString())
+							log.info("energyIn element not found: "+ reading.name.toString())
 						}
 						
 				}
