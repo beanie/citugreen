@@ -71,15 +71,26 @@ class PremiseController extends BaseController {
 		def sumElec = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(7).toDate(), date2:now.toDate()])
 		def sumWater = WaterReading.executeQuery("select sum(reading.readingValueHot), sum(reading.readingValueCold), sum(reading.readingValueGrey) from WaterReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(7).toDate(), date2:now.toDate()])
 		def sumHeat = HeatReading.executeQuery("select sum(reading.readingValueHeat) from HeatReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(7).toDate(), date2:now.toDate()])
-
+		def sumSolar = EnergyReading.executeQuery("select sum(reading.readingValueIn) from EnergyReading as reading where reading.energyItem.type='solar' and reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(7).toDate(), date2:now.toDate()])
+		def sumWind = EnergyReading.executeQuery("select sum(reading.readingValueIn) from EnergyReading as reading where reading.energyItem.type='wind' and reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(7).toDate(), date2:now.toDate()])
+		
 		def sumElecLW = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(14).toDate(), date2:now.minusDays(7).toDate()])
 		def sumWaterLW = WaterReading.executeQuery("select sum(reading.readingValueHot), sum(reading.readingValueCold), sum(reading.readingValueGrey) from WaterReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(14).toDate(), date2:now.minusDays(7).toDate()])
 		def sumHeatLW = HeatReading.executeQuery("select sum(reading.readingValueHeat) from HeatReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(14).toDate(), date2:now.minusDays(7).toDate()])
 
 
 		Float tmp = new Float(0.15)
-		def boiledKettles = ((sumElec[0]).toFloat() + (sumHeat[0]).toFloat())/tmp
-
+		
+		Float co2 = new Float(0.43)
+		
+		def boiledKettles = 0
+		def co2Saved = 0
+		
+		if (sumElec[0]) { boiledKettles = sumElec[0].toFloat() } 	
+		if (sumHeat[0]) { boiledKettles = (boiledKettles + sumHeat[0].toFloat())/tmp }
+		
+		if (sumSolar[0]) { co2Saved = sumSolar[0].toFloat() }
+		if (sumWind[0]) { co2Saved = (co2Saved + sumWind[0].toFloat())*co2 }
 
 		def heat = [:]
 
@@ -104,6 +115,9 @@ class PremiseController extends BaseController {
 
 
 		premise.put ("boiledKettles", boiledKettles)
+		premise.put ("co2Saved", co2Saved)
+		premise.put ("windIn", sumWind[0])
+		premise.put ("solarIn", sumSolar[0])
 		premise.put("electricity", electricity )
 		premise.put("heat",  heat)
 		premise.put("hotWater", hotWater)
