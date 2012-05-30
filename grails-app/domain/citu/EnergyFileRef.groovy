@@ -6,6 +6,6 @@ class EnergyFileRef {
 	String category
 	
 	static constraints = {
-		category inList: ["Water", "Electricity", "Heat"]
+		category inList: ["Water", "Electricity", "Heat", "energyIn"]
     }
 }

@@ -26,6 +26,12 @@ class EnergyReadingService {
 		log.info ("Processing Water")
 	}
 	
+	def processEnergy() {
+		def energyUrls = EnergyFileRef.findAllByCategory('energyIn')
+		processXmlEnergy(energyUrls)
+		log.info ("Processing Energy")
+	}
+	
 	def processHeat() {
 		def f = new File("c:\\files\\")
 		log.info ("Processing Heat")
@@ -175,7 +181,7 @@ class EnergyReadingService {
 	/*
 	 * No longer needed - does not handle timeouts
 	 */
-	def processXmlOld(ArrayList urlList) {
+	def processXmlEnergy(ArrayList urlList) {
 		
 		urlList.each { urlEntry ->
 			try {
@@ -194,38 +200,38 @@ class EnergyReadingService {
 					def tmpFileDate = df.parse(fileInfo.creationdate.toString())
 					
 					readings.element.each { reading ->
-						def premise = Premise.findByFlatNo(reading.name.toString())
-						if (premise){
-							if (urlEntry.category.equals("Electricity")) {
-								ArrayList tmp = ElecReading.findAllByPremise(premise)
+						def s = reading.name.toString()
+						def tmpS = s.replaceAll(" ", "")
+						def gene = EnergyItem.findByCollector(tmpS)
+					
+				//		def gene = reading.name.toString()
+							
+						log.info ("item " + s)
+						log.info ("item removed " + tmpS)
+						log.info ("item recovered " + gene)
+						
+						if (gene){
+							log.info ("in here  ")
+							
+							if (urlEntry.category.equals("energyIn")) {
+								ArrayList tmp = EnergyReading.findAll(gene)
 								log.info("TEMP SIZE"+ tmp.size())
-								def last
-								// TODO re-add this - check with phil
 								if (tmp) {
-									last = tmp.first().readingValueElec
-									if (tmp.size() == 1) {
-										ElecReading er = tmp.first()
-										log.info("ER + "+ er)
-										er.setPremise(null)
-										log.info("delete")
-										er.delete()
-										// er.delete()
+									
+									reading = reading.item.rawvalue.toInteger()
+									log.info ("reading" + reading)
+					
 									}
-								} else {
-									last = 0
-								}
-								def realValue = (reading.item.rawvalue.toInteger() - last)
-								def tmpReading = new ElecReading(readingValueElec:realValue, fileDate:tmpFileDate, premise:premise).save()
-							} else if (urlEntry.category.equals("Water")) {
-								def tmpReading = new WaterReading(fileDate:tmpFileDate, readingValueCold:reading.item[0].valuelong.toString(), readingValueHot:reading.item[1].valuelong.toString(), readingValueGrey:reading.item[2].valuelong.toString(), premise:premise).save()
+								def tmpReading = new EnergyReading(readingValueIn:reading, fileDate:tmpFileDate, collector:gene).save()
 							}
 						} else {
 							log.warn("Premise not found: "+ reading.name.toString())
 						}
-					}
+						
+				}
 				}
 				log.info("Processed XML file : "+ urlEntry.urlPath)
-			} catch (Exception e) {
+				} catch (Exception e) {
 				log.error(e)
 			}
 		}

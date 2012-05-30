@@ -47,7 +47,7 @@ class RankService {
 		// if its the last day of the week, archive them
 		if (now.dayOfWeek().getAsShortText().equals('Tues')) {
 			for (i in premises) {
-				i.prevWeekRank = rank
+				i.prevWeekRank = i.rank
 				i.save()
 			}
 		}

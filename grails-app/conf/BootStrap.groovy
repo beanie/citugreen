@@ -20,6 +20,7 @@ class BootStrap {
 			def xml13 = new EnergyFileRef(urlPath:'http://office.citu.co.uk:9023/xmlelectricity6.xml', category:'Electricity').save()
 			def xml14 = new EnergyFileRef(urlPath:'http://office.citu.co.uk:9025/xmlelectricity8.xml', category:'Electricity').save()
 			def xml15 = new EnergyFileRef(urlPath:'http://office.citu.co.uk:9028/xmlelectricity11.xml', category:'Electricity').save()
+			def xml16 = new EnergyFileRef(urlPath:'http://office.citu.co.uk:9030/xmlwater13.xml', category:'energyIn').save()
 		}
 		if (!TarrifList.count()) {
 			TarrifList tl = new TarrifList(coldWaterTarrif:0.003339, hotWaterTarrif:0.006249, greyWaterTarrif:0.001365, elecTarrif:0.108, heatTarrif:0.1163).save()
@@ -206,14 +207,11 @@ class BootStrap {
 			Premise Flat623 = new Premise(bathrooms:1, premiseType:'Flat', core:'None', bedrooms:1, squareArea:58,flatNo:'623', addressLine1:'Beanie House', addressLine2:'CituGreen Est.', postCode:'SW5 3AP', user:neil).save()
 			Premise Flat999 = new Premise(bathrooms:1, premiseType:'Flat', core:'None', bedrooms:7, squareArea:58,flatNo:'overAll', addressLine1:'Overall', addressLine2:'Overall', postCode:'SW5 3AP', user:neil).save()
 			
+			EnergyItem Solar1 = new EnergyItem(collector:'SolarEnergyMeter', type:'solar').save()
+			EnergyItem Wind1 = new EnergyItem(collector:'WindTurbineNo1', type:'wind').save()
+			EnergyItem Wind2 = new EnergyItem(collector:'WindTurbineNo2', type:'wind').save()
 			
 			
-			Premise WindTurbine1 = new Premise(bathrooms:1, premiseType:'Flat', core:'None', bedrooms:5, squareArea:58,flatNo:'Wind Turbine No1', addressLine1:'Phil House', addressLine2:'CituGreen Est.', postCode:'SW5 3AP', user:energy).save()
-			Premise WindTurbine2 = new Premise(bathrooms:1, premiseType:'Flat', core:'None', bedrooms:5, squareArea:58,flatNo:'Wind Turbine No2', addressLine1:'Phil House', addressLine2:'CituGreen Est.', postCode:'SW5 3AP', user:energy).save()
-			Premise Solar1 = new Premise(bathrooms:1, premiseType:'Flat', core:'None', bedrooms:5, squareArea:58,flatNo:'Solar Energy Meter', addressLine1:'Phil House', addressLine2:'CituGreen Est.', postCode:'SW5 3AP', user:energy).save()
-			Premise GreyWaterTotal = new Premise(bathrooms:1, premiseType:'Flat', core:'None', bedrooms:5, squareArea:58,flatNo:'Main Grey Water Meter', addressLine1:'Phil House', addressLine2:'CituGreen Est.', postCode:'SW5 3AP', user:energy).save()
-			Premise GreyWaterTopUp = new Premise(bathrooms:1, premiseType:'Flat', core:'None', bedrooms:5, squareArea:58,flatNo:'Grey Water Top Up Meter', addressLine1:'Phil House', addressLine2:'CituGreen Est.', postCode:'SW5 3AP', user:energy).save()
-							
 			SetTopBox stb1 = new SetTopBox(macAddress:'44:58:29:17:2A:EC', TSMid:'12315464', premise:Flat114).save()
 			SetTopBox stb2 = new SetTopBox(macAddress:'44:58:29:17:23:D2', TSMid:'345345', premise:Flat2).save()
 			SetTopBox stb3 = new SetTopBox(macAddress:'44:58:29:17:C1:52', TSMid:'345564', premise:Flat3).save()
