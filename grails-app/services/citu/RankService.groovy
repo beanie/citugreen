@@ -57,7 +57,7 @@ class RankService {
 		cleanUpGorm()
 		
 		// if its the last day of the week, archive them
-		if (now.dayOfWeek().getAsShortText().equals('Sun')) {
+		if (now.dayOfWeek().getAsShortText().equalsIgnoreCase('Sun')) {
 			for (i in premises) {
 				i.prevWeekRank = i.rank
 				i.save()

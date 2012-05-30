@@ -12,5 +12,6 @@ class HourlyJob {
 		energyReadingService.processElec()
 		energyReadingService.processWater()
 		energyReadingService.processHeat()
+		energyReadingService.processEnergy()
     }
 }
