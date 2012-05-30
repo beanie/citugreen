@@ -4,7 +4,17 @@ import org.joda.time.*
 
 class RankService {
 
-    static transactional = true
+	def sessionFactory  // injected
+	def propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
+	
+	static transactional = true
+	
+	private void cleanUpGorm()  {
+		def session = sessionFactory.currentSession
+		session.flush()
+		session.clear()
+		propertyInstanceMap.get().clear()
+	}
 
     def generateRankings() {	
 		
@@ -44,12 +54,15 @@ class RankService {
 			i.save()
 		}
 		
+		cleanUpGorm()
+		
 		// if its the last day of the week, archive them
-		if (now.dayOfWeek().getAsShortText().equals('Tues')) {
+		if (now.dayOfWeek().getAsShortText().equals('Sun')) {
 			for (i in premises) {
 				i.prevWeekRank = i.rank
 				i.save()
 			}
+			cleanUpGorm()
 		}
 		
     }
