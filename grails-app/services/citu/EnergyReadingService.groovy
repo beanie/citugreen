@@ -232,8 +232,8 @@ class EnergyReadingService {
 									last = 0
 								}
 
-								def realValue = (reading.item.rawvalue.toInteger()- last)
-								def readingValue = reading.item.rawvalue.toInteger()
+								def realValue = reading.item.rawvalue.toInteger()
+								def readingValue = (reading.item.rawvalue.toInteger()- last)
 
 								def tmpReading = new EnergyReading(fileDate:tmpFileDate, readingValueIn:readingValue, realReadingIn:realValue, energyItem:energyItem).save()
 
