@@ -21,6 +21,7 @@ class BootStrap {
 			def xml14 = new EnergyFileRef(urlPath:'http://office.citu.co.uk:9025/xmlelectricity8.xml', category:'Electricity').save()
 			def xml15 = new EnergyFileRef(urlPath:'http://office.citu.co.uk:9028/xmlelectricity11.xml', category:'Electricity').save()
 			def xml16 = new EnergyFileRef(urlPath:'http://office.citu.co.uk:9030/xmlwater13.xml', category:'energyIn').save()
+			def xml17 = new EnergyFileRef(urlPath:'http://office.citu.co.uk:9020/xmlelectricity3.xml', category:'energyIn').save()
 		}
 		if (!TarrifList.count()) {
 			TarrifList tl = new TarrifList(coldWaterTarrif:0.003339, hotWaterTarrif:0.006249, greyWaterTarrif:0.001365, elecTarrif:0.108, heatTarrif:0.1163).save()
@@ -210,7 +211,8 @@ class BootStrap {
 			EnergyItem Solar1 = new EnergyItem(collector:'SolarEnergyMeter', type:'solar').save()
 			EnergyItem Wind1 = new EnergyItem(collector:'WindTurbineNo1', type:'wind').save()
 			EnergyItem Wind2 = new EnergyItem(collector:'WindTurbineNo2', type:'wind').save()
-			
+			EnergyItem Lift1 = new EnergyItem(collector:'LiftNo1', type:'lift').save()
+			EnergyItem Lift2 = new EnergyItem(collector:'LiftNo2', type:'lift').save()
 			
 			SetTopBox stb1 = new SetTopBox(macAddress:'44:58:29:17:2A:EC', TSMid:'12315464', premise:Flat114).save()
 			SetTopBox stb2 = new SetTopBox(macAddress:'44:58:29:17:23:D2', TSMid:'345345', premise:Flat2).save()

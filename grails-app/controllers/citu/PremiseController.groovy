@@ -73,6 +73,9 @@ class PremiseController extends BaseController {
 		def sumHeat = HeatReading.executeQuery("select sum(reading.readingValueHeat) from HeatReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(7).toDate(), date2:now.toDate()])
 		def sumSolar = EnergyReading.executeQuery("select sum(reading.readingValueIn) from EnergyReading as reading where reading.energyItem.type='solar' and reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(7).toDate(), date2:now.toDate()])
 		def sumWind = EnergyReading.executeQuery("select sum(reading.readingValueIn) from EnergyReading as reading where reading.energyItem.type='wind' and reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(7).toDate(), date2:now.toDate()])
+		def sumLift = EnergyReading.executeQuery("select sum(reading.readingValueIn) from EnergyReading as reading where reading.energyItem.type='lift' and reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(7).toDate(), date2:now.toDate()])
+		
+		
 		
 		def sumElecLW = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(14).toDate(), date2:now.minusDays(7).toDate()])
 		def sumWaterLW = WaterReading.executeQuery("select sum(reading.readingValueHot), sum(reading.readingValueCold), sum(reading.readingValueGrey) from WaterReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(14).toDate(), date2:now.minusDays(7).toDate()])
@@ -118,6 +121,7 @@ class PremiseController extends BaseController {
 		premise.put ("co2Saved", co2Saved)
 		premise.put ("windIn", sumWind[0])
 		premise.put ("solarIn", sumSolar[0])
+		premise.put ("liftOut", sumLift[0])
 		premise.put("electricity", electricity )
 		premise.put("heat",  heat)
 		premise.put("hotWater", hotWater)
@@ -177,7 +181,7 @@ class PremiseController extends BaseController {
 			premise.put("hotWater", HelperUtil.generateHotWaterSummary(sumWater[0][0], highlows, avgWater[0][0], getDayPrediction(premise.flatNo, "hotWater")))
 			premise.put("coldWater", HelperUtil.generateColdWaterSummary(sumWater[0][1], highlows, avgWater[0][1], getDayPrediction(premise.flatNo, "coldWater")))
 			premise.put("greyWater", HelperUtil.generateGreyWaterSummary(sumWater[0][2], highlows, avgWater[0][2], getDayPrediction(premise.flatNo, "greyWater")))
-
+			
 			render premise as JSON
 		}
 	}
