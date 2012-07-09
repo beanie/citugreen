@@ -80,6 +80,12 @@ class PremiseController extends BaseController {
 		def sumElecLW = ElecReading.executeQuery("select sum(reading.readingValueElec) from ElecReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(14).toDate(), date2:now.minusDays(7).toDate()])
 		def sumWaterLW = WaterReading.executeQuery("select sum(reading.readingValueHot), sum(reading.readingValueCold), sum(reading.readingValueGrey) from WaterReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(14).toDate(), date2:now.minusDays(7).toDate()])
 		def sumHeatLW = HeatReading.executeQuery("select sum(reading.readingValueHeat) from HeatReading as reading where reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(14).toDate(), date2:now.minusDays(7).toDate()])
+		def sumLiftLW = EnergyReading.executeQuery("select sum(reading.readingValueIn) from EnergyReading as reading where reading.energyItem.type='lift' and reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(14).toDate(), date2:now.minusDays(7).toDate()])
+		def sumSolarLW = EnergyReading.executeQuery("select sum(reading.readingValueIn) from EnergyReading as reading where reading.energyItem.type='solar' and reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(14).toDate(), date2:now.minusDays(7).toDate()])
+		def sumWindLW = EnergyReading.executeQuery("select sum(reading.readingValueIn) from EnergyReading as reading where reading.energyItem.type='wind' and reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(14).toDate(), date2:now.minusDays(7).toDate()])
+		def sumLift2W = EnergyReading.executeQuery("select sum(reading.readingValueIn) from EnergyReading as reading where reading.energyItem.type='lift' and reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(21).toDate(), date2:now.minusDays(14).toDate()])
+		def sumSolar2W = EnergyReading.executeQuery("select sum(reading.readingValueIn) from EnergyReading as reading where reading.energyItem.type='solar' and reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(21).toDate(), date2:now.minusDays(14).toDate()])
+		def sumWind2W = EnergyReading.executeQuery("select sum(reading.readingValueIn) from EnergyReading as reading where reading.energyItem.type='wind' and reading.fileDate between:date1 AND :date2 ", [date1:now.minusDays(21).toDate(), date2:now.minusDays(14).toDate()])
 
 
 		Float tmp = new Float(0.15)
@@ -116,19 +122,32 @@ class PremiseController extends BaseController {
 		greyWater.put("thisWeek", (sumWater[0][2]))
 		greyWater.put("lastWeek", (sumWaterLW[0][2]))
 
+		def solarIn = [:]
+		solarIn.put("thisWeek", sumSolar[0])
+		solarIn.put("lastWeek", sumSolarLW[0])
+		solarIn.put("2Week", sumSolar2W[0])
+		
+		def windIn = [:]
+		windIn.put("thisWeek", sumWind[0])
+		windIn.put("lastWeek", sumWindLW[0])
+		windIn.put("2Week", sumWind2W[0])
+		
+		def liftOut= [:]
+		liftOut.put("thisWeek", sumLift[0])
+		liftOut.put("lastWeek", sumLiftLW[0])
+		liftOut.put("2Week", sumLift2W[0])
+		
 
 		premise.put ("boiledKettles", boiledKettles)
 		premise.put ("co2Saved", co2Saved)
-		premise.put ("windIn", sumWind[0])
-		premise.put ("solarIn", sumSolar[0])
-		premise.put ("liftOut", sumLift[0])
+		premise.put ("windIn", windIn)
+		premise.put ("solarIn", solarIn)
+		premise.put ("liftOut", liftOut)
 		premise.put("electricity", electricity )
 		premise.put("heat",  heat)
 		premise.put("hotWater", hotWater)
 		premise.put("coldWater", coldWater)
 		premise.put("greyWater", greyWater)
-
-
 
 		render premise as JSON
 	}
