@@ -95,7 +95,7 @@ class PremiseController extends BaseController {
 		def boiledKettles = 0
 		def co2Saved = 0
 		
-		if (sumElec[0]) { boiledKettles = sumElec[0].toFloat() } 	
+		if (sumElec[0]) { boiledKettles = sumElec[0].toFloat() }
 		if (sumHeat[0]) { boiledKettles = (boiledKettles + sumHeat[0].toFloat())/tmp }
 		
 		if (sumSolar[0]) { co2Saved = sumSolar[0].toFloat() }
@@ -161,6 +161,7 @@ class PremiseController extends BaseController {
 		if (!premiseInstance) {
 
 			render("200":"invalid premise ID")
+		
 		} else {
 
 			def now = new DateTime()
@@ -299,7 +300,8 @@ class PremiseController extends BaseController {
 
 			if (viewType.equals("week")) {
 
-				now = now.withDayOfWeek(DateTimeConstants.MONDAY)
+				def endODay = now.plusDays(1).minusSeconds(1)
+				now = endODay.minusWeeks(1)
 				if (utilType.equals("elec")) {
 					swingData = getElecSwingometer(premiseInstance.bedrooms, now.toDate(), now.plusWeeks(1).minusSeconds(1).toDate())
 				} else if (utilType.equals("water")) {
