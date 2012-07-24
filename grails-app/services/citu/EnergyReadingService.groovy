@@ -1,5 +1,6 @@
 package citu
 
+import org.apache.commons.net.ftp.FTPClient;
 import au.com.bytecode.opencsv.CSVReader;
 
 import groovyx.net.http.HTTPBuilder;
@@ -10,6 +11,7 @@ import groovy.util.XmlSlurper;
 import java.text.*;
 import java.util.Date;
 
+@Grab(group='commons-net', module='commons-net', version='2.0')
 
 class EnergyReadingService {
 	
@@ -42,11 +44,74 @@ class EnergyReadingService {
 		processXmlEnergy(energyUrls)
 		log.info ("Processing Energy")
 	}
+	
+	def cleanUpHeatFiles() {
+		
+		def f = new File("c:\\files\\")
+		def p = new File("c:\\files\\processed\\")
+		
+		def host     = 'bunker3.dyndns.tv'
+		def path     = '/*'
+		def user     = 'heatReading'
+		def password = 'vmd3m0'
+		def fles
+				
+		log.info ("clearing files")
+		
+		
+		new FTPClient().with {
+			connect host
+			println replyString
+		 
+			login user, password
+			println replyString
+			
+			
+			println replyString
+			
+			fles = listNames()
+			fles.each { fl ->
+				println ("test"+fl)
+				
+					if (fl.endsWith(".csv"))
+					{
+						println ("in here"+fl)	
+						def incomingFile = new File (fl)
+						incomingFile.withOutputStream { ostream -> retrieveFile fl, ostream }		
+						incomingFile.renameTo(new File("c:\\files\\", fl))
+					}
+				}
+			disconnect()
+		}
+		if (f.exists()){
+			f.eachFile() {file ->
+				p.eachFile(){pfile ->
+					if (file.name != pfile.name){
+						
+					//	log.info ("not delete" + file.name)
+											
+						
+						}else{
+						
+				//		log.info ("delete" + file.name)
+						
+						file.delete()
+						
+						
+						}
+			
+				}
+		
+			}
+		}
+	}
+	
 
 	def processHeat() {
 		def f = new File("c:\\files\\")
 		log.info ("Processing Heat")
 
+		
 		if( f.exists() ){
 			f.eachFile(){ file->
 				if( !file.isDirectory() )

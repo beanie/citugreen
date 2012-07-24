@@ -6,6 +6,12 @@ class ReadingController {
 	
 	def scaffold = true
 	
+	def cleanUpHeatFiles = {
+		energyReadingService.cleanUpHeatFiles()
+		render("cleaning files")
+	}
+	
+	
 	def frig = {
 		energyReadingService.frig()
 		render("Manually h4x3d")
