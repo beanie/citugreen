@@ -18,13 +18,10 @@ class PremiseController extends BaseController {
 			"getReadingsByDate",
 			"getBuildingReadingsSummary",
 			"getReadingsSummary",
-			"ben",
 			"forecast"
 		]]
 
 	def scaffold = true
-
-	def ben = { rankService.generateRankings() }
 
 	def summary = {
 

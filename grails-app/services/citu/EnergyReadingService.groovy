@@ -27,6 +27,15 @@ class EnergyReadingService {
 		propertyInstanceMap.get().clear()
 	}
 
+	def sendError(String text, String title) {
+		sendMail {
+			to "ben@chilling.co.uk","sonic@sellick.org"
+			from "alerts@vmbunker.net"
+			subject text
+			body title
+		 }
+	}
+	
 	def processElec() {
 		def elecUrls = EnergyFileRef.findAllByCategory('Electricity')
 		processXml(elecUrls)
@@ -95,7 +104,11 @@ class EnergyReadingService {
 					if (file.name != pfile.name){
 						
 						fileCount++
-							log.info ("filecount" + fileCount.toString())
+						log.info ("filecount" + fileCount.toString())
+						
+						if (fileCount == 0) {
+							sendError("CITU ERROR", "HEAT READINGS ARE : "+ fileCount)
+						}
 											
 						}else{
 						

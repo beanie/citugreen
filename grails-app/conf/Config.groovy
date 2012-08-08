@@ -91,3 +91,16 @@ log4j = {
     warn   'org.mortbay.log',
 		   'org.codehaus.groovy.grails.web.servlet'  //  controllers
 }
+
+grails {
+	mail {
+	  host = "smtp.gmail.com"
+	  port = 465
+	  username = "alerts@vmbunker.net"
+	  password = "v1rg1nm3d1a"
+	  props = ["mail.smtp.auth":"true",
+			   "mail.smtp.socketFactory.port":"465",
+			   "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
+			   "mail.smtp.socketFactory.fallback":"false"]
+	}
+ }

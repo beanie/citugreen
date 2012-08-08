@@ -13,7 +13,7 @@ class ReadingController {
 	
 	
 	def frig = {
-		energyReadingService.frig()
+		energyReadingService.processElec()
 		render("Manually h4x3d")
 	}
 	
