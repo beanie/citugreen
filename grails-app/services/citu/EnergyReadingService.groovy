@@ -63,6 +63,7 @@ class EnergyReadingService {
 		new FTPClient().with {
 			setDefaultPort(60100)
 			connect host
+			enterLocalPassiveMode()
 			println replyString
 			
 		 
@@ -77,30 +78,30 @@ class EnergyReadingService {
 				
 					if (fl.endsWith(".csv"))
 					{
-						println ("in here"+fl)	
+					//	println ("in here"+fl)	
 						def incomingFile = new File (fl)
 						incomingFile.withOutputStream { ostream -> retrieveFile fl, ostream }	
-						log.info ("not delete" + fl.name)
-											
+										
 						incomingFile.renameTo(new File("c:\\files\\", fl))
 					}
 				}
 			disconnect()
 		}
+		
+		def fileCount=0
 		if (f.exists()){
 			f.eachFile() {file ->
 				p.eachFile(){pfile ->
 					if (file.name != pfile.name){
 						
-					//	log.info ("not delete" + file.name)
+						fileCount++
+							log.info ("filecount" + fileCount.toString())
 											
-						
 						}else{
 						
-				//		log.info ("delete" + file.name)
+						//	log.info ("delete" + file.name)
 						
 						file.delete()
-						
 						
 						}
 			
@@ -108,6 +109,9 @@ class EnergyReadingService {
 		
 			}
 		}
+		
+		
+		
 	}
 	
 
