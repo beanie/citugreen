@@ -21,7 +21,7 @@ class HeatReadingsJob {
 	
 		def execute() {
 			log.info("starting Heat reading download")
-			energyReadingService.cleanUpHeatFiles()
+			energyReadingService.processHeat()
 		}
 	}
 	

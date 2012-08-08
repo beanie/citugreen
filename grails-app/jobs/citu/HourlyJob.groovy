@@ -11,7 +11,6 @@ class HourlyJob {
         log.info("starting quartz job")
 		energyReadingService.processElec()
 		energyReadingService.processWater()
-		energyReadingService.processHeat()
 		energyReadingService.processEnergy()
     }
 }
