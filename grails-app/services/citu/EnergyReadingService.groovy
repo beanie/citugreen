@@ -54,10 +54,27 @@ class EnergyReadingService {
 		log.info ("Processing Energy")
 	}
 	
-	def cleanUpHeatFiles() {
+	def readDirToArray(String dir) {
+		def p = new File(dir)
+		def fileList = new ArrayList()
+		if (p.exists()) {
+			log.debug("directory exists")
+			p.eachFile() { pfile ->
+				fileList.add(pfile.name)
+			}
+		} else {
+			log.debug("directory not exist")
+		}
+		return fileList
+	}
+	
+	def processHeat() {
 		
-		def f = new File("c:\\files\\")
-		def p = new File("c:\\files\\processed\\")
+		def unProc = "c:\\files\\"
+		def proc = "c:\\files\\processed\\"
+		
+		// def unProc = "/Users/beanie/tmp"
+		// def proc = "/Users/beanie/tmp/processed"
 		
 		def host     = 'office.citu.co.uk'
 		def path     = '/*'
@@ -68,68 +85,43 @@ class EnergyReadingService {
 				
 		log.info ("clearing files")
 		
-		
+		// grab the local processed list
+		def myList = readDirToArray(proc)
+			
 		new FTPClient().with {
 			setDefaultPort(60100)
 			connect host
 			enterLocalPassiveMode()
-			println replyString
-			
+			log.info(replyString)
 		 
 			login user, password
-			println replyString
+			log.info(replyString)
 			
-	
+			def fileCount=0
 			
 			fles = listNames()
 			fles.each { fl ->
-				println ("test"+fl)
 				
 					if (fl.endsWith(".csv"))
 					{
-					//	println ("in here"+fl)	
-						def incomingFile = new File (fl)
-						incomingFile.withOutputStream { ostream -> retrieveFile fl, ostream }	
-										
-						incomingFile.renameTo(new File("c:\\files\\", fl))
+						if (myList.contains(fl)) {
+							log.debug(fl + " in the list")
+						} else {
+							log.info(fl + " NOT in the list")
+							def incomingFile = new File (fl)
+							incomingFile.withOutputStream { ostream -> retrieveFile fl, ostream }
+							incomingFile.renameTo(new File(unProc, fl))
+							fileCount++
+						}
 					}
 				}
+			if (fileCount == 0) {
+				sendError("Citu Error", "Heat readings count : "+ fileCount)
+			}
 			disconnect()
 		}
 		
-		def fileCount=0
-		if (f.exists()){
-			f.eachFile() {file ->
-				p.eachFile(){pfile ->
-					if (file.name != pfile.name){
-						
-						fileCount++
-						log.info ("filecount" + fileCount.toString())
-						
-						if (fileCount == 0) {
-							sendError("CITU ERROR", "HEAT READINGS ARE : "+ fileCount)
-						}
-											
-						}else{
-						
-						//	log.info ("delete" + file.name)
-						
-						file.delete()
-						
-						}
-			
-				}
-		
-			}
-		}
-		
-		
-		
-	}
-	
-
-	def processHeat() {
-		def f = new File("c:\\files\\")
+		def f = new File(unProc)
 		log.info ("Processing Heat")
 
 		
@@ -166,7 +158,7 @@ class EnergyReadingService {
 								log.info("Premise not found: "+ fields[0])
 							}
 						}
-						file.renameTo(new File("c:\\files\\processed", file.name))
+						file.renameTo(new File(proc, file.name))
 						file.delete()
 						cleanUpGorm()
 						log.info("Processed CSV file : "+ file.name)
@@ -272,6 +264,7 @@ class EnergyReadingService {
 					}
 				}
 			} catch (Exception e) {
+				sendError("Citu Error", "Processing XML with : "+ e)
 				log.error(e)
 			}
 		}
@@ -333,6 +326,7 @@ class EnergyReadingService {
 				cleanUpGorm()
 				log.info("Processed XML file : "+ urlEntry.urlPath)
 			} catch (Exception e) {
+				sendError("Citu Error", "Processing XML with : "+ e)
 				log.error(e)
 			}
 		}
