@@ -50,24 +50,26 @@ class EnergyReadingService {
 		def f = new File("c:\\files\\")
 		def p = new File("c:\\files\\processed\\")
 		
-		def host     = 'bunker3.dyndns.tv'
+		def host     = 'office.citu.co.uk'
 		def path     = '/*'
-		def user     = 'heatReading'
-		def password = 'vmd3m0'
+		def user     = 'virgin'
+		def password = 'virginftp1066'
+		def port = '60100'
 		def fles
 				
 		log.info ("clearing files")
 		
 		
 		new FTPClient().with {
+			setDefaultPort(60100)
 			connect host
 			println replyString
+			
 		 
 			login user, password
 			println replyString
 			
-			
-			println replyString
+	
 			
 			fles = listNames()
 			fles.each { fl ->
@@ -77,7 +79,9 @@ class EnergyReadingService {
 					{
 						println ("in here"+fl)	
 						def incomingFile = new File (fl)
-						incomingFile.withOutputStream { ostream -> retrieveFile fl, ostream }		
+						incomingFile.withOutputStream { ostream -> retrieveFile fl, ostream }	
+						log.info ("not delete" + fl.name)
+											
 						incomingFile.renameTo(new File("c:\\files\\", fl))
 					}
 				}
