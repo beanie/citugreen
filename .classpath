@@ -13,6 +13,19 @@
 	<classpathentry exported="true" kind="con" path="GROOVY_DSL_SUPPORT"/>
 	<classpathentry kind="con" path="com.springsource.sts.grails.core.CLASSPATH_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/OpenForecast-0.5.0.jar"/>
+	<classpathentry kind="lib" path="lib/javamelody-1.37.0.jar"/>
+	<classpathentry kind="lib" path="lib/jrobin-1.5.9.jar"/>
+	<classpathentry kind="lib" path="lib/commons-lang3-3.1.jar"/>
+	<classpathentry kind="lib" path="lib/ezmorph-1.0.6.jar"/>
+	<classpathentry kind="lib" path="lib/http-builder-0.5.0.jar"/>
+	<classpathentry kind="lib" path="lib/httpclient-4.0.jar"/>
+	<classpathentry kind="lib" path="lib/httpcore-4.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/json-lib-2.3-jdk15.jar"/>
+	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.18-bin.jar"/>
+	<classpathentry kind="lib" path="lib/opencsv-2.3.jar"/>
+	<classpathentry kind="lib" path="lib/tagsoup-1.2.1.jar"/>
+	<classpathentry kind="lib" path="lib/xml-resolver-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/commons-net-3.1.jar"/>
 	<classpathentry excluding="BuildConfig.groovy|*DataSource.groovy|UrlMappings.groovy|Config.groovy|BootStrap.groovy|spring/resources.groovy" kind="src" path=".link_to_grails_plugins/bubbling-2.1.4/grails-app/conf">
 		<attributes>
 			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
@@ -88,6 +101,31 @@
 			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="src" path=".link_to_grails_plugins/mail-1.0/grails-app/i18n">
+		<attributes>
+			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path=".link_to_grails_plugins/mail-1.0/grails-app/services">
+		<attributes>
+			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path=".link_to_grails_plugins/mail-1.0/grails-app/taglib">
+		<attributes>
+			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path=".link_to_grails_plugins/mail-1.0/grails-app/views">
+		<attributes>
+			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path=".link_to_grails_plugins/mail-1.0/src/groovy">
+		<attributes>
+			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry excluding="BuildConfig.groovy|*DataSource.groovy|UrlMappings.groovy|Config.groovy|BootStrap.groovy|spring/resources.groovy" kind="src" path=".link_to_grails_plugins/quartz-0.4.2/grails-app/conf">
 		<attributes>
 			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
@@ -133,18 +171,5 @@
 			<attribute name="com.springsource.sts.grails.core.SOURCE_FOLDER" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/javamelody-1.37.0.jar"/>
-	<classpathentry kind="lib" path="lib/jrobin-1.5.9.jar"/>
-	<classpathentry kind="lib" path="lib/commons-lang3-3.1.jar"/>
-	<classpathentry kind="lib" path="lib/ezmorph-1.0.6.jar"/>
-	<classpathentry kind="lib" path="lib/http-builder-0.5.0.jar"/>
-	<classpathentry kind="lib" path="lib/httpclient-4.0.jar"/>
-	<classpathentry kind="lib" path="lib/httpcore-4.0.1.jar"/>
-	<classpathentry kind="lib" path="lib/json-lib-2.3-jdk15.jar"/>
-	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.18-bin.jar"/>
-	<classpathentry kind="lib" path="lib/opencsv-2.3.jar"/>
-	<classpathentry kind="lib" path="lib/tagsoup-1.2.1.jar"/>
-	<classpathentry kind="lib" path="lib/xml-resolver-1.2.jar"/>
-	<classpathentry kind="lib" path="lib/commons-net-3.1.jar"/>
 	<classpathentry kind="output" path="target-eclipse/classes"/>
 </classpath>

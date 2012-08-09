@@ -1,9 +1,12 @@
-#Tue Jul 03 16:23:47 BST 2012
+#Wed Aug 08 14:33:22 BST 2012
 eclipse.preferences.version=1
 encoding//.link_to_grails_plugins/csv-0.3.1/grails-app/i18n=UTF-8
 encoding//.link_to_grails_plugins/csv-0.3.1/grails-app/i18n/messages.properties=UTF-8
 encoding//.link_to_grails_plugins/google-visualization-0.5/grails-app/i18n=UTF-8
 encoding//.link_to_grails_plugins/google-visualization-0.5/grails-app/i18n/messages.properties=UTF-8
+encoding//.link_to_grails_plugins/mail-1.0/grails-app/i18n=UTF-8
+encoding//.link_to_grails_plugins/mail-1.0/grails-app/i18n/messages.properties=UTF-8
+encoding//.link_to_grails_plugins/mail-1.0/grails-app/i18n/messages_fr.properties=UTF-8
 encoding//.link_to_grails_plugins/quartz-0.4.2/grails-app/i18n=UTF-8
 encoding//.link_to_grails_plugins/quartz-0.4.2/grails-app/i18n/messages.properties=UTF-8
 encoding//grails-app/controllers/citu/LeedsEventsController.groovy=UTF-8

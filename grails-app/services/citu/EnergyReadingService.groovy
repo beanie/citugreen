@@ -29,7 +29,7 @@ class EnergyReadingService {
 
 	def sendError(String text, String title) {
 		sendMail {
-			to "ben@chilling.co.uk","sonic@sellick.org"
+			to "ben@chilling.co.uk","sonic@sellick.org","fraser@citu.co.uk"
 			from "alerts@vmbunker.net"
 			subject text
 			body title
@@ -105,9 +105,9 @@ class EnergyReadingService {
 					if (fl.endsWith(".csv"))
 					{
 						if (myList.contains(fl)) {
-							log.debug(fl + " in the list")
+					//		log.debug(fl + " in the list")
 						} else {
-							log.info(fl + " NOT in the list")
+					//		log.info(fl + " NOT in the list")
 							def incomingFile = new File (fl)
 							incomingFile.withOutputStream { ostream -> retrieveFile fl, ostream }
 							incomingFile.renameTo(new File(unProc, fl))
@@ -129,7 +129,7 @@ class EnergyReadingService {
 			f.eachFile(){ file->
 				if( !file.isDirectory() )
 					if (file.name.endsWith(".csv")) {
-						log.info("Processing CSV file : "+ file.name)
+				//		log.info("Processing CSV file : "+ file.name)
 
 						SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd")
 						def tmpFileDate = df.parse(file.name)
@@ -155,13 +155,13 @@ class EnergyReadingService {
 
 								//	log.info ("premise found")
 							} else {
-								log.info("Premise not found: "+ fields[0])
+					//			log.info("Premise not found: "+ fields[0])
 							}
 						}
 						file.renameTo(new File(proc, file.name))
 						file.delete()
 						cleanUpGorm()
-						log.info("Processed CSV file : "+ file.name)
+					//	log.info("Processed CSV file : "+ file.name)
 					}
 			}
 		}
@@ -249,7 +249,7 @@ class EnergyReadingService {
 								}
 							} else {
 
-								log.info("Premise not found: "+ reading.name.toString())
+					//			log.info("Premise not found: "+ reading.name.toString())
 							}
 						}
 						cleanUpGorm()
@@ -260,12 +260,13 @@ class EnergyReadingService {
 					response.failure = { resp ->
 						log.error("Unexpected error: ${resp.status} : ${resp.statusLine.reasonPhrase}")
 						Date tmpDate = new Date()
-
+						sendError("Citu Error", "Readings error : ${resp.status} : ${resp.statusLine.reasonPhrase}")
 					}
 				}
 			} catch (Exception e) {
 				sendError("Citu Error", "Processing XML with : "+ e)
 				log.error(e)
+		
 			}
 		}
 	}
@@ -298,7 +299,7 @@ class EnergyReadingService {
 
 						if (energyItem) {
 
-							log.info ("Processing energyIn element : "+ name)
+//							log.info ("Processing energyIn element : "+ name)
 
 							if (urlEntry.category.equals("energyIn")) {
 
@@ -318,7 +319,7 @@ class EnergyReadingService {
 
 							}
 						} else {
-							log.info("energyIn element not found: "+ reading.name.toString())
+	//						log.info("energyIn element not found: "+ reading.name.toString())
 						}
 
 					}
