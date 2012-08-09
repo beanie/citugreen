@@ -272,7 +272,7 @@ class EnergyReadingService {
 	}
 
 	/*
-	 * No longer needed - does not handle timeouts
+	 * used for energy readings
 	 */
 	def processXmlEnergy(ArrayList urlList) {
 
@@ -321,7 +321,7 @@ class EnergyReadingService {
 						} else {
 	//						log.info("energyIn element not found: "+ reading.name.toString())
 						}
-
+						
 					}
 				}
 				cleanUpGorm()
